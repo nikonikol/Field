@@ -14,6 +14,8 @@ var express = require('express')
 var mysql = require('./models/mysql')
 //加载md5插件
 var md5 = require('blueimp-md5')
+//加载运算函数
+var calbulk= require('./public/js/cal.js')
 //promise函数
 function mypinfoquery(sql) {
     return new Promise(function (resolve, reject) {
@@ -55,18 +57,19 @@ router.post('/', function (req, res) {
         studentinfo
     WHERE
         studentinfo.UserId="` + userid + `" AND
-        studentinfo.Password="` + password + `"
+        studentinfo.Password="` + password + `"AND
+        studentinfo.role=1
         `
         mysql(sql, function (err, data) {
+            console.log(data)
             if (err) {
-
                 return res.status(500).json({
                     err_code: 500,
                     message: err.message
                 })
             }
             // 如果账号和密码匹配，则 Userinformation 是查询到的用户对象，否则就是 null
-            if (!data) {
+            if (!data[0]) {
                 return res.status(200).json({
                     //提供错误码
                     err_code: 1,
@@ -103,8 +106,7 @@ router.get('/out', function (req, res) {
 router.get('/selfinformation', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
+    } else {
         var sql = null
         var userid = req.session.Userinformation[0].UserId
         console.log(userid)
@@ -139,12 +141,12 @@ router.get('/selfinformation', function (req, res) {
             })
         }
     }
-    })
+})
 router.post('/selfinformation', function (req, res) {
     var sql = null
     var userid = req.session.Userinformation[0].UserId
-    var nickname=req.body.nickname
-    var password=req.body.password
+    var nickname = req.body.nickname
+    var password = req.body.password
     try {
         sql = `UPDATE 
         studentinfo 
@@ -266,12 +268,11 @@ router.get('/index', function (req, res) {
 router.get('/task', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-    var sql = null
-    var userid = req.session.Userinformation[0].UserId
-    try {
-        sql = `SELECT
+    } else {
+        var sql = null
+        var userid = req.session.Userinformation[0].UserId
+        try {
+            sql = `SELECT
         tasktable.TaskId,
         tasktable.FromTime,
         tasktable.EndTime,
@@ -286,64 +287,63 @@ router.get('/task', function (req, res) {
     WHERE
         tasktable.Sponsor="` + userid + `"
     `
-        mysql(sql, function (err, task) {
-            if (err) {
-                return res.status(500).send('Server error')
-            }
-            if (task) {
-                res.render('task.html', {
-                    Userinformation: req.session.Userinformation,
-                    task: task
-                })
-            }
-        })
-    } catch (err) {
-        res.status(500).json({
-            code: 2,
-            err: err.message,
-            message: ''
-        })
+            mysql(sql, function (err, task) {
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (task) {
+                    res.render('task.html', {
+                        Userinformation: req.session.Userinformation,
+                        task: task
+                    })
+                }
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
+
     }
-        
-}
 })
 
 //发布新任务
 router.get('/newtask', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-    var sql = null
-    var userid = req.session.Userinformation[0].UserId
-    try {
-        sql = `SELECT
+    } else {
+        var sql = null
+        var userid = req.session.Userinformation[0].UserId
+        try {
+            sql = `SELECT
         studentinfo.Class
     FROM
         studentinfo
     WHERE
         studentinfo.UserId="` + userid + `"
     `
-        mysql(sql, function (err, newtask) {
-            newtask = newtask[0].Class.split(',')
-            if (err) {
-                return res.status(500).send('Server error')
-            }
-            if (newtask) {
-                res.render('newtask.html', {
-                    Userinformation: req.session.Userinformation,
-                    newtask: newtask
-                })
-            }
-        })
-    } catch (err) {
-        res.status(500).json({
-            code: 2,
-            err: err.message,
-            message: ''
-        })
+            mysql(sql, function (err, newtask) {
+                newtask = newtask[0].Class.split(',')
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (newtask) {
+                    res.render('newtask.html', {
+                        Userinformation: req.session.Userinformation,
+                        newtask: newtask
+                    })
+                }
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
     }
-}
 })
 router.post('/newtask', function (req, res) {
     var sql = null
@@ -386,50 +386,49 @@ router.post('/newtask', function (req, res) {
 
 //删除任务
 router.get('/deletetask', function (req, res) {
-    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
-        return res.redirect('/')
-    }
-    else{
-    var sql = null
-    var taskid = req.query.Taskid
-    try {
-        sql = `
+        if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+            return res.redirect('/')
+        } else {
+            var sql = null
+            var taskid = req.query.Taskid
+            try {
+                sql = `
     DELETE
     FROM
     tasktable
     WHERE
     tasktable.TaskId="` + taskid + `"
     `
-        mysql(sql, function (err) {
-            if (err) {
-                return res.status(500).send('Server error')
+                mysql(sql, function (err) {
+                    if (err) {
+                        return res.status(500).send('Server error')
+                    }
+                    res.redirect('/task')
+                })
+            } catch (err) {
+                res.status(500).json({
+                    code: 2,
+                    err: err.message,
+                    message: ''
+                })
             }
-            res.redirect('/task')
-        })
-    } catch (err) {
-        res.status(500).json({
-            code: 2,
-            err: err.message,
-            message: ''
-        })
-    }
-}
-})
+        }
+    })
 
 
-/**
- * 任务测试路由
- *  *//
- //测试主页面
- router.get('/test',function(req,res){
-    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
-        return res.redirect('/')
-    }
-    else{
-    var taskid=req.query.Taskid
-    var sql=null
-    try{
-        sql=`SELECT
+    /**
+     * 任务测试路由
+     *  */
+    /
+    //测试主页面
+    router.get('/test', function (req, res) {
+        if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+            return res.redirect('/')
+        } else {
+            var taskid = req.query.Taskid
+            var sql = null
+            try {
+                sql = `SELECT
         testtable.Testid,
         testtable.TestName,
         testtable.TaskId,
@@ -439,16 +438,57 @@ router.get('/deletetask', function (req, res) {
         FROM
         testtable
         WHERE
-        testtable.TaskId="`+taskid+`"
+        testtable.TaskId="` + taskid + `"
         `
-            mysql(sql, function (err, test) {
+                mysql(sql, function (err, test) {
+                    if (err) {
+                        return res.status(500).send('Server error')
+                    }
+                    if (test) {
+                        res.render('test.html', {
+                            Userinformation: req.session.Userinformation,
+                            test: test
+                        })
+                    }
+                })
+            } catch (err) {
+                res.status(500).json({
+                    code: 2,
+                    err: err.message,
+                    message: ''
+                })
+            }
+        }
+    })
+
+//发布新测试
+router.get('/newtest', function (req, res) {
+    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+        return res.redirect('/')
+    } else {
+        var taskid = req.query.Taskid
+        var sql = null
+        try {
+            sql = `SELECT
+        testtable.Testid,
+        testtable.TestName,
+        testtable.TaskId,
+        testtable.Content,
+        testtable.TotalGrade,
+        testtable.Deadtime
+        FROM
+        testtable
+        WHERE
+        testtable.TaskId="` + taskid + `"
+        `
+            mysql(sql, function (err, newtest) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
-                if (test) {
-                    res.render('test.html', {
+                if (newtest) {
+                    res.render('newtest.html', {
                         Userinformation: req.session.Userinformation,
-                        test: test
+                        newtest: newtest
                     })
                 }
             })
@@ -460,83 +500,38 @@ router.get('/deletetask', function (req, res) {
             })
         }
     }
-    })
-
-//发布新测试
-router.get('/newtest',function(req,res){
-    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
-        return res.redirect('/')
-    }
-    else{
-    var taskid=req.query.Taskid
-    var sql=null
-    try{
-        sql=`SELECT
-        testtable.Testid,
-        testtable.TestName,
-        testtable.TaskId,
-        testtable.Content,
-        testtable.TotalGrade,
-        testtable.Deadtime
-        FROM
-        testtable
-        WHERE
-        testtable.TaskId="`+taskid+`"
-        `
-        mysql(sql,function(err,newtest){
-            if(err){
-                return res.status(500).send('Server error')
-            }
-            if (newtest) {
-                res.render('newtest.html',{
-                    Userinformation: req.session.Userinformation,
-                    newtest:newtest
-                })
-            }
-        })       
-    }
-    catch(err){
-        res.status(500).json({
-            code:2,
-            err: err.message,
-            message: ''
-        })
-    }
-}
 })
 
-router.post('/newtest',function(req,res){
-    var sql=null
-    var testname=req.body.testname
-    var taskid=parseInt(req.headers.referer.split('=').slice(1,2)[0])
-    var totalgrade=req.body.totalgrade
-    var deadtime=req.body.deadtime
-    var testcontent=req.body.testcontent 
-    try{
-        sql=`INSERT INTO
+router.post('/newtest', function (req, res) {
+    var sql = null
+    var testname = req.body.testname
+    var taskid = parseInt(req.headers.referer.split('=').slice(1, 2)[0])
+    var totalgrade = req.body.totalgrade
+    var deadtime = req.body.deadtime
+    var testcontent = req.body.testcontent
+    try {
+        sql = `INSERT INTO
         testtable 
         (TestName,TaskId,Content,TotalGrade,Deadtime,Testid)
         VALUES
-        ("`+testname+`","`+taskid+`","`+testcontent+`","`+totalgrade+`","`+deadtime+`",0)
+        ("` + testname + `","` + taskid + `","` + testcontent + `","` + totalgrade + `","` + deadtime + `",0)
         `
-        mysql(sql,function(err,data){
-            if(err){
-             
+        mysql(sql, function (err, data) {
+            if (err) {
+
                 return res.status(200).json({
                     err_code: 1,
                     message: ''
                 })
-            }
-            else{
+            } else {
                 res.status(200).json({
                     err_code: 0,
                     message: 'OK'
                 })
             }
         })
-        
-    }
-    catch(err){
+
+    } catch (err) {
         res.status(500).json({
             err_code: 500,
             message: err.message
@@ -549,59 +544,55 @@ router.post('/newtest',function(req,res){
 router.get('/edittest', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
+    } else {
+        res.render('edittest.html', {
+            Userinformation: req.session.Userinformation
+        })
     }
-    else{
-    res.render('edittest.html', {
-        Userinformation: req.session.Userinformation
-    })
-}
 })
 
 //删除测试
-router.get('/deletetest',function(req,res){
+router.get('/deletetest', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-    var sql=null  
-    var taskid=req.query.Taskid
-    var testid=req.query.Testid
-    try{
-        sql=`
+    } else {
+        var sql = null
+        var taskid = req.query.Taskid
+        var testid = req.query.Testid
+        try {
+            sql = `
         DELETE
         FROM
         testtable
         WHERE
-        testtable.TestId="`+testid+`"
+        testtable.TestId="` + testid + `"
         `
-        mysql(sql,function(err,data){
-            if(err){
-                return res.status(500).send('Server error')
-            }
-            res.redirect('/test?Taskid='+taskid)
-        })
+            mysql(sql, function (err, data) {
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                res.redirect('/test?Taskid=' + taskid)
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
     }
-    catch(err){
-        res.status(500).json({
-            code:2,
-            err: err.message,
-            message: ''
-        })
-    }
-}
 })
 
 //批改测试
-router.get('/correcttest',function(req,res){
+router.get('/correcttest', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-    var taskid=req.query.TaskId
-    var userid=req.query.UserId
-    var sql=null
-    try{
-        sql=`SELECT
+    } else {
+        var taskid = req.query.TaskId
+        var userid = req.query.UserId
+        var sql = null
+        try {
+            sql = `SELECT
         testresult.UserId,
         testresult.TaskId,
         testresult.TestId,
@@ -612,60 +603,57 @@ router.get('/correcttest',function(req,res){
         FROM
         testresult
         WHERE
-        testresult.TaskId="`+taskid+`"AND
-        testresult.UserId="`+userid+`"
+        testresult.TaskId="` + taskid + `"AND
+        testresult.UserId="` + userid + `"
         `
-        mysql(sql,function(err,correcttest){
-            console.log(correcttest)
-            if(err){
-                return res.status(500).send('Server error')
-            }
-            if (correcttest) {
-                res.render('correcttest.html',{
-                    Userinformation: req.session.Userinformation,
-                    correcttest:correcttest
-                })
-            }
-        })       
+            mysql(sql, function (err, correcttest) {
+                console.log(correcttest)
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (correcttest) {
+                    res.render('correcttest.html', {
+                        Userinformation: req.session.Userinformation,
+                        correcttest: correcttest
+                    })
+                }
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
     }
-    catch(err){
-        res.status(500).json({
-            code:2,
-            err: err.message,
-            message: ''
-        })
-    }
-}
 })
 
-router.post('/correcttest',function(req,res){
-    var sql=null
-    var grade=req.body.grade
-    var correctcontent=req.body.correctcontent 
-    try{
-        sql=`"UPDATE
+router.post('/correcttest', function (req, res) {
+    var sql = null
+    var grade = req.body.grade
+    var correctcontent = req.body.correctcontent
+    try {
+        sql = `"UPDATE
         testresult
         SET 
         
         `
-        mysql(sql,function(err,data){
-            if(err){
-             
+        mysql(sql, function (err, data) {
+            if (err) {
+
                 return res.status(200).json({
                     err_code: 1,
                     message: ''
                 })
-            }
-            else{
+            } else {
                 res.status(200).json({
                     err_code: 0,
                     message: 'OK'
                 })
             }
         })
-        
-    }
-    catch(err){
+
+    } catch (err) {
         res.status(500).json({
             err_code: 500,
             message: err.message
@@ -678,16 +666,15 @@ router.post('/correcttest',function(req,res){
 /**
  * 学生
  */
-//展示学生信息
-router.get('/studenttask',function(req,res){
+//通过任务展示学生信息
+router.get('/studenttask', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-    var grade=req.query.class
-    var taskid=req.query.taskid
-    try{
-        sql=`SELECT
+    } else {
+        var grade = req.query.class
+        var taskid = req.query.taskid
+        try {
+            sql = `SELECT
         studentinfo.UserId,
         studentinfo.Name,
         location.LastTime,
@@ -698,54 +685,102 @@ router.get('/studenttask',function(req,res){
         location,
         tasktable
         WHERE
-        tasktable.TaskId="`+taskid+`"AND
+        tasktable.TaskId="` + taskid + `"AND
         tasktable.Class=studentinfo.Class AND
         studentinfo.UserId=location.UserId
         ORDER BY
         studentinfo.UserId
         `
-        mysql(sql,function(err,studata){
-            if(err){
-                return res.status(500).send('Server error')
-            }
-            if (studata) {
-                res.render('studata.html',{
-                    Userinformation: req.session.Userinformation,
-                    studata:studata
-                })
-            }
-        })       
+            mysql(sql, function (err, studata) {
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (studata) {
+                    res.render('studata.html', {
+                        Userinformation: req.session.Userinformation,
+                        studata: studata
+                    })
+                }
+            })
 
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
     }
-    catch(err){
+})
+
+//老师所带班级全部信息
+router.get('/allstudent', function (req, res) {
+    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+        return res.redirect('/')
+    } else
+        var teacherclass = req.session.Userinformation[0].Class.split(',')
+    var studentarry = new Array
+    var istrue = 0
+    try {
+        for (i = 0; i < teacherclass.length; i++) {
+            sqlclass = `
+                SELECT
+                studentinfo.Class,
+                studentinfo.NickName,
+                studentinfo.Name,
+                studentinfo.UserId
+                FROM
+                studentinfo
+                WHERE
+                studentinfo.Class = '` + teacherclass[i] + `' 
+               `
+            mysql(sqlclass, function (err, data) {
+                if (err) {
+                    return res.status(500).json({
+                        err_code: 500,
+                        message: err.message
+                    })
+                }
+                studentarry = studentarry.concat(data)
+                istrue = istrue + 1
+                if (teacherclass.length === istrue) {
+                    res.render('allstudent.html', {
+                        Userinformation: req.session.Userinformation,
+                        Studentinformation: studentarry
+                    })
+                }
+            })
+        }
+    } catch (err) {
         res.status(500).json({
-            code:2,
+            code: 2,
             err: err.message,
             message: ''
         })
     }
-}
+
+
 })
 
 /**
  * 地图操作
  */
 //显示全部人员位置信息
-router.get('/taskmap',function(req,res){
+router.get('/taskmap', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
+    } else {
+        res.render('allstumap.html', {
+            Userinformation: req.session.Userinformation
+        })
     }
-    else{
-    res.render('allstumap.html',{
-        Userinformation: req.session.Userinformation
-    })}
-     
 
 
-router.post('/taskmap',function(req,res){
-    var taskid=parseInt(req.headers.referer.split('=').slice(1,2)[0])
-    try{
-        sql=`SELECT
+
+    router.post('/taskmap', function (req, res) {
+        var taskid = parseInt(req.headers.referer.split('=').slice(1, 2)[0])
+        try {
+            sql = `SELECT
         studentinfo.Name,
         studentinfo.Class,
         location.UserId,
@@ -755,53 +790,48 @@ router.post('/taskmap',function(req,res){
         studentinfo ,
         location
         WHERE
-        location.TaskId = "`+taskid+`" AND
+        location.TaskId = "` + taskid + `" AND
         studentinfo.UserId = location.UserId
         `
-        mysql(sql,function(err,taskmap){
-            //获取最后一个值 
-            // console.log(JSON.parse(taskmap[0].Location).location.slice(-1)[0].log)
-            if(err){
-                return res.status(500).send('Server error')
-            }
-            if (taskmap) {
-                return res.status(200).json({
-                    taskmap: taskmap
-                })
-               
-            }
-        })       
+            mysql(sql, function (err, taskmap) {
+                //获取最后一个值 
+                // console.log(JSON.parse(taskmap[0].Location).location.slice(-1)[0].log)
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (taskmap) {
+                    return res.status(200).json({
+                        taskmap: taskmap
+                    })
 
-    }
-    catch(err){
-        res.status(500).json({
-            code:2,
-            err: err.message,
-            message: ''
-        })
-    }
+                }
+            })
+
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
+    })
 })
-})
-
-
 
 //显示人员轨迹信息
-router.get('/onemap',function(req,res){
+router.get('/onemap', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-        res.render('onestumap.html',{
+    } else {
+        res.render('onestumap.html', {
             Userinformation: req.session.Userinformation
         })
     }
 })
-    
-     
-router.post('/onemap',function(req,res){
-    var userid=parseInt(req.headers.referer.split('=').slice(1,2)[0])
-    try{
-        sql=`SELECT
+
+router.post('/onemap', function (req, res) {
+    var userid = parseInt(req.headers.referer.split('=').slice(1, 2)[0])
+    try {
+        sql = `SELECT
         studentinfo.Name,
         studentinfo.Class,
         location.UserId,
@@ -811,25 +841,24 @@ router.post('/onemap',function(req,res){
         studentinfo ,
         location
         WHERE
-        location.UserId = "`+userid+`" AND
+        location.UserId = "` + userid + `" AND
         studentinfo.UserId = location.UserId
         `
-        mysql(sql,function(err,onemap){
-            if(err){
+        mysql(sql, function (err, onemap) {
+            if (err) {
                 return res.status(500).send('Server error')
             }
             if (onemap) {
                 return res.status(200).json({
                     onemap: onemap
                 })
-               
-            }
-        })       
 
-    }
-    catch(err){
+            }
+        })
+
+    } catch (err) {
         res.status(500).json({
-            code:2,
+            code: 2,
             err: err.message,
             message: ''
         })
@@ -840,12 +869,11 @@ router.post('/onemap',function(req,res){
 
 //导入数据学生数据到数据库Importexcel
 /*获取所有学生位置信息路由*/
-router.get('/SaveExcle',function(req,res){
+router.get('/SaveExcle', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-        res.render('saveexcle.html',{
+    } else {
+        res.render('saveexcle.html', {
             Userinformation: req.session.Userinformation
         })
     }
@@ -878,8 +906,7 @@ router.post('/SaveExcle', function (req, res) {
     //获取到要插入数据库的对象
     console.log(insertData)
 
-    try {
-       //插入数据库
+    //插入数据库
     for (i = 0; i < insertData.length; i++) {
         UserId = insertData[i].UserId
         Name = insertData[i].Name
@@ -889,160 +916,311 @@ router.post('/SaveExcle', function (req, res) {
         AddData(UserId, Name, Password, Nickname, Class)
     }
 
-    res.render('saveexcle.html',{
-        Userinformation: req.session.Userinformation,
-        Success: '文件上传成功'
-    })
-        
-    } catch (err) {
-        console.log(err.message)
-        res.status(500).json({
-            code: 2,
-            err: err.message,
-            message: []
-        })
-
-        res.render('saveexcle.html',{
-            Userinformation: req.session.Userinformation,
-            Success: '文件上传失败'
-        })
-    }
-
-    
     function AddData(UserId, Name, Password, Nickname, Class) {
         console.log(UserId, Name, Password, Nickname, Class)
-        searchsql = `SELECT
-        studentinfo.Name
-        FROM
-        studentinfo
-        WHERE
-        studentinfo.UserId = '` + UserId + `'`
+        try {
+            searchsql = `SELECT
+            studentinfo.Name
+            FROM
+            studentinfo
+            WHERE
+            studentinfo.UserId = '` + UserId + `'`
 
-        var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
-        var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Icon,Class,Role) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','http://k.zol-img.com.cn/sjbbs/7692/a7691515_s.jpg','" + Class + "',0)"
+            var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
+            var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Class) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','" + Class + "')"
+            mysql(searchsql, function (err, data) {
+                if (err) {
 
-        ;(async () => {
-      
-                const result = await mypinfoquery(searchsql)
-                if (result[0] === undefined) {
+                    return res.status(500).json({
+                        err_code: 500,
+                        message: err.message
+                    })
+                }
+                if (data[0] === undefined) {
                     // 插入
-                    await mypinfoquery(insectsql)
-                }
-                else{
-                    // 更新
-                    await mypinfoquery(updatesql)
-                }
+                    mysql(insectsql, function (err, data) {
+                        if (err) {
 
-        })()
+                            return res.status(500).json({
+                                err_code: 500,
+                                message: err.message
+                            })
+                        }
+                    })
+                } else {
+                    //更新
+                    mysql(updatesql, function (err, data) {
+                        if (err) {
 
+                            return res.status(500).json({
+                                err_code: 500,
+                                message: err.message
+                            })
+                        }
+                    })
+                    // res.status(200).json({
+                    //     err_code: 0,
+                    //     message: 'OK'
+                    // })
+                }
+            })
+        } catch (err) {
+            return res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
     }
-})
-   
-    
 
+    return res.status(200).json({
+        code: 0,
+        error: 'success',
+        message: ""
+    })
+})
 
 /**成绩统计路由 */
 //统计数据
-
-router.get('/gradedisplay',function(req,res){
+router.get('/gradedisplay', function (req, res) {
+    var taskid = req.query.TaskId
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
-    }
-    else{
-        res.render('gradedisplay.html',{
-            Userinformation: req.session.Userinformation
+    } else {
+        res.render('gradedisplay.html', {
+            Userinformation: req.session.Userinformation,
+            taskid: taskid
         })
     }
 })
 
 router.post('/gradedisplay', function (req, res) {
-    const teacherclass= req.session.Userinformation[0].Class.split(',') 
-    var studentgrade=new Array
-    
-    var sum = function(x,y){ return x+y;};　　//求和函数
-    var square = function(x){ return x*x;};　　//数组中每个元素求它的平方
-    var querysult =new Array
-    
-
-    ;(async()=>{
-        try{
-            for(i=0;i<teacherclass.length;i++){
-                sql = `
+    var taskid = req.query.TaskId
+    var studentgrade = new Array
+    var sum = function (x, y) {
+        return x + y;
+    }; //求和函数
+    var square = function (x) {
+        return x * x;
+    }; //数组中每个元素求它的平方
+    var querysult = new Array;
+    (async () => {
+        try {
+            sql = `
                     SELECT
                     studentinfo.Class,
                     studentinfo.NickName,
                     studentinfo.Name,
                     studentinfo.UserId,
-                    testresult.FinallyGrade
+                    testresult.Grade
                     FROM
                     studentinfo,
                     testresult
                     WHERE
-                    studentinfo.Class = '` + teacherclass[i] + `' 
+                    testresult.TaskId = '` + taskid + `' AND
+                    testresult.UserId=studentinfo.UserId
                     ORDER BY
-                    testresult.FinallyGrade ASC
+                    testresult.Grade ASC
 
                 `
-
-                studentgrade[i]=  await mypinfoquery(sql)
-                var studentgradelist =new Array
-                for(k=0;k<studentgrade[i].length;k++){
-                    
-                    
-                    if(studentgrade[i][0]!=undefined){
-                        studentgradelist[k]=studentgrade[i][k].FinallyGrade
+            studentgrade = await mypinfoquery(sql)
+            var studentgradelist = new Array
+            var studentgradename = new Array
+            // if (studentgrade) {
+            //     var grade = new Array
+            //     var name = new Array
+            //     var mycaldata = new Array    
+            //     for (var i = 0; i < analydata.length; i++) {
+            //         grade[i] = studentgrade[i].Grade
+            //         name[i] = studentgrade[i].Name
+            //         mycaldata[i] = studentgrade[i].Grade
+            //     }
+            //     return res.status(200).json({
+            //         grade: grade,
+            //         name: name,
+            //         calreason:calbulk.cal(mycaldata)
+            //     })
+            // }
+            for (k = 0; k < studentgrade.length; k++) {
+                if (studentgrade != undefined) {
+                    studentgradelist[k] = studentgrade[k].Grade
+                    studentgradename[k] = studentgrade[k].Name
+                }
+            }
+            querysult = studentgradelist
+            queryname = studentgradename
+            if(querysult[0] != undefined){
+                var name=new Array
+                var mycaldata = new Array    
+                for (var i = 0; i < querysult.length; i++) {
+                    mycaldata[i] = querysult[i]
+                }
+             for (var i = 0; i < queryname.length; i++) {
+                        name[i] = queryname[i]
                     }
-                    
-                   
-                }
-                querysult[i]=studentgradelist
-                //console.log( querysult[i])
-                // if(querysult[0]==undefined){
-                //     return
-                // }
-                //studentgrade[i]=querysult[i].FinallyGrade
-                //console.log(querysult[0].FinallyGrade, querysult[querysult.length-1].FinallyGrade)
-                //studentgrade
+                return res.status(200).json({
+                    calreason:calbulk.cal(mycaldata),
+                    name:name,
+                    grade:mycaldata
+                })
             }
+            //studentgrade[i]=querysult[i].FinallyGrade
+            //console.log(querysult[0].FinallyGrade, querysult[querysult.length-1].FinallyGrade)
+            //studentgrade
 
-            for(j=0;j<querysult.length;j++){
-                if(querysult[j][0]!=undefined){
-                    var mean = querysult[j].reduce(sum)/querysult[j].length
-            var deviations = querysult[j].map(function(x){return x-mean;})
-            var stddev = Math.sqrt(deviations.map(square).reduce(sum)/(querysult[j].length-1));
-            var max = Math.max.apply(null,querysult[j])
-            var min = Math.min.apply(null,querysult[j])
+            // for (j = 0; j < querysult.length; j++) {
+            //     if (querysult[j] != undefined) {
+            //         console.log(querysult.length)
+            //         var mean = querysult[j].reduce(sum) / querysult[j].length
+            //         console.log(mean)
+            //         var deviations = querysult[j].map(function (x) {
+            //             return x - mean;
+            //         })
+            //         var stddev = Math.sqrt(deviations.map(square).reduce(sum) / (querysult[j].length - 1));
+            //         var max = Math.max.apply(null, querysult[j])
+            //         var min = Math.min.apply(null, querysult[j])
+            //         if (querysult[j].length % 2 == 0) {
+            //             mid = (querysult[j][querysult[j].length / 2] + querysult[j][querysult[j].length / 2 + 1]) / 2
+            //         }
+            //         if (querysult[j].length % 2 != 0) {
+            //             mid = querysult[j][(querysult[j].length + 1) / 2]
+            //         }
+            //         console.log(mean + "平均数 ")
+            //         console.log(deviations + "deviations ")
+            //         console.log(stddev + "方差 ")
+            //         console.log(max + "最大值 ")
+            //         console.log(min + "最小值 ")
+            //         console.log(mid + "中位数 ")
+            //         // return res.status(200).json({
+            //         //     code: 0,
+            //         //     err: '成功',
+            //         //     mean: mean,
+            //         //     deviations: deviations,
+            //         //     stddev: stddev,
+            //         //     max: max,
+            //         //     min: min,
+            //         //     mid: mid
+            //         // })
+            //     }
+            // }
 
-            if (querysult[j].length%2==0){
-                mid = (querysult[j][querysult[j].length/2]+querysult[j][querysult[j].length/2+1])/2
-            }
-            if (querysult[j].length%2!=0){
-                mid = querysult[j][(querysult[j].length+1)/2]
-            }
-             console.log(mean+"平均数 ")
-            console.log(deviations+"deviations ")
-            console.log(stddev+"方差 ")
-            console.log(max+"最大值 ")
-            console.log(min+"最小值 ")
-            console.log(mid+"中位数 ")
-                }
 
-          
-                
-            }
-            
-        }
-
-        catch(e){
-            console.log(e.message)
+        } catch (e) {
             res.status(500).json({
                 code: 2,
                 err: e.message,
                 message: ''
             })
         }
-        
+
     })()
 
- })
-module.exports=router
+})
+
+// router.post('/gradedisplay', function (req, res) {
+//     const teacherclass = req.session.Userinformation[0].Class.split(',')
+//     var studentgrade = new Array
+//     var sum = function (x, y) {
+//         return x + y;
+//     }; //求和函数
+//     var square = function (x) {
+//         return x * x;
+//     }; //数组中每个元素求它的平方
+//     var querysult = new Array;
+//     (async () => {
+//         try {
+//             for (i = 0; i < teacherclass.length; i++) {
+//                 sql = `
+//                     SELECT
+//                     studentinfo.Class,
+//                     studentinfo.NickName,
+//                     studentinfo.Name,
+//                     studentinfo.UserId,
+//                     testresult.Grade
+//                     FROM
+//                     studentinfo,
+//                     testresult
+//                     WHERE
+//                     studentinfo.Class = '` + teacherclass[i] + `' 
+//                     ORDER BY
+//                     testresult.Grade ASC
+//                 `
+//                 studentgrade[i] = await mypinfoquery(sql)
+
+//                 var studentgradelist = new Array
+//                 for (k = 0; k < studentgrade[i].length; k++) {
+//                     if (studentgrade[i][0] != undefined) {
+//                         studentgradelist[k] = studentgrade[i][k].FinallyGrade
+//                     }
+//                 }
+//                 querysult[i] = studentgradelist
+//                 console.log(studentgradelist)
+//                 //console.log( querysult[i])
+//                 // if(querysult[0]==undefined){
+//                 //     return
+//                 // }
+//                 //studentgrade[i]=querysult[i].FinallyGrade
+//                 //console.log(querysult[0].FinallyGrade, querysult[querysult.length-1].FinallyGrade)
+//                 //studentgrade
+//             }
+//             for (j = 0; j < querysult.length; j++) {
+//                 if (querysult[j][0] != undefined) {
+//                     var mean = querysult[j].reduce(sum) / querysult[j].length
+//                     var deviations = querysult[j].map(function (x) {
+//                         return x - mean;
+//                     })
+//                     var stddev = Math.sqrt(deviations.map(square).reduce(sum) / (querysult[j].length - 1));
+//                     var max = Math.max.apply(null, querysult[j])
+//                     var min = Math.min.apply(null, querysult[j])
+
+//                     if (querysult[j].length % 2 == 0) {
+//                         mid = (querysult[j][querysult[j].length / 2] + querysult[j][querysult[j].length / 2 + 1]) / 2
+//                     }
+//                     if (querysult[j].length % 2 != 0) {
+//                         mid = querysult[j][(querysult[j].length + 1) / 2]
+//                     }
+//                     console.log(mean + "平均数 ")
+//                     console.log(deviations + "deviations ")
+//                     console.log(stddev + "方差 ")
+//                     console.log(max + "最大值 ")
+//                     console.log(min + "最小值 ")
+//                     console.log(mid + "中位数 ")
+//                 }
+//             }
+//             return res.status(200).json({
+//                 code: 0,
+//                 err: err.message,
+//                 mean:mean,
+//                 deviations:deviations,
+//                 stddev:stddev,
+//                 max:max,
+//                 min:min,
+//                 mid:mid
+
+//             })
+//         } catch (e) {
+
+//             res.status(500).json({
+//                 code: 2,
+//                 err: e.message,
+//                 message: ''
+//             })
+//         }
+
+//     })()
+
+// })
+
+/**关于我们路由 */
+router.get('/aboutour', function (req, res) {
+    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+        return res.redirect('/')
+    } else {
+        res.render('aboutour.html', {
+            Userinformation: req.session.Userinformation
+        })
+    }
+})
+
+
+module.exports = router

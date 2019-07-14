@@ -9,10 +9,13 @@ var myconnection = mysql.createConnection({
 });
  //连接
  myconnection.connect()
- function myquery(sql,calback){
-  myconnection.query(sql,function(err,res){  
-    calback(err,res)
-  })
+
+ function myquery(sql, calback) {
+   myconnection.query(sql, function (err, res) {
+     calback(err, res)
+   })
+
+
 
  //关闭连接
  //myconnection.end();
