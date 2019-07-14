@@ -1,0 +1,93 @@
+{{extend './layout.html'}}
+
+
+<!-- 连接块 -->
+{{block 'link'}}
+
+{{/block}}
+
+
+<!-- 连接选择 -->
+{{block 'select'}}
+<section class="content-header">
+        <h1>
+          成绩统计
+          <small>信息</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> 成绩统计</a></li>
+          <li class="active">Here</li>
+        </ol>
+</section>
+{{/block}}
+
+<!-- 内容部分 -->
+{{block 'content'}}
+<section class="content">
+    <div class="container" >
+        <script src="/node_modules/bootstrap/dist/css/bootstrap.css"></script>
+        <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">数据查询与统计</div>
+                <div class="panel-body">
+                        <p>根据最值来查询历史数据关于历史数据的平均数，标准差，等的计算</p>
+                        <form id="analy_form" class="form-inline">
+                                <h1 class="page-header">根据时间查询</h1>
+                                <div >
+                                        <div class="form-group">
+                                                <label name="min">起始时间</label>
+                                                <input name="min_time" type="date" class="form-control" id="min" placeholder="0">
+                                              </div>
+                                              <div class="form-group">
+                                                <label name="max">终止时间</label>
+                                                <input name="max_time" type="date" class="form-control" id="max" placeholder="100">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">查询</button>
+                                </div>
+                        
+                                
+                        </form>
+                </div>
+              
+                <!-- Table -->
+                
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+    
+                            <th>平均数</th>
+    
+                            <th>最大值</th>
+    
+                            <th>最小值</th>
+    
+                            <th>标准差</th>
+    
+                            <th>中位数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    
+                        <tr>
+                            <td >数据统计</td>
+                            <td id='num1'></td>
+                            <td id='num2'></td>
+                            <td id='num3'></td>
+                            <td id='num4'></td>
+                            <td id='num5'></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+        </div>
+    
+    </div>
+        <div id="container" style="height: 600px"></div>
+</section>
+{{/block}}
+
+<!-- js部分 -->
+{{block 'js'}}
+
+{{/block}}

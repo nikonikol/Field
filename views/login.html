@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../public/css/logincss/login.css">
+    <link rel="stylesheet" href="../public/css/logincss/reset.min.css">
+    <link rel="stylesheet" href="../public/css/logincss/css.css">
+    <link rel="stylesheet" href="../public/css/logincss/css1.css">
+    <!-- <link rel="stylesheet" href="../css/logincss/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="../public/css/logincss/style.css">  
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css">
+    <script src="../node_modules/jquery/dist/jquery.js"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <title>登陆</title>
+</head>
+<body>
+
+    <!-- 顶端导航栏 -->
+    <!-- 中部内容部分 -->
+    <div class="context">
+        <!-- 右边登陆部分 -->
+        <div class="">
+        <div class=" container">
+                <div class="info">
+                        <h1>欢迎登陆</h1>
+                      </div>
+                    </div>
+                    <div class="form">
+                      <div class="thumbnail"><img src="../public/css/logincss/hat.svg"/></div>
+                      <!-- <form class="register-form">
+                        <input type="text" placeholder="name"/>
+                        <input type="password" placeholder="password"/>
+                        <input type="text" placeholder="email address"/>
+                        <button>create</button>
+                        <p class="message">Already registered? <a href="#">Sign In</a></p>
+                      </form> -->
+                      <form class="login-form" id="login_form">
+                        <input name='UserId' type="text" placeholder="username"/>
+                        <input name='Password' type="password" placeholder="password"/>
+                        <button type="submit">登陆</button>
+                        <!-- <p class="message">Not registered? <a href="#">Create an account</a></p> -->
+                      </form>
+        </div>
+    </div>
+</div>
+<script>
+    $('#login_form').on('submit', function (e) {
+      e.preventDefault()
+      var formData = $(this).serialize()
+      console.log(formData)
+      $.ajax({
+        url: '/',
+        type: 'post',
+        data: formData,
+        dataType: 'json',
+        success: function (data) {
+          var err_code = data.err_code
+          if (err_code === 0) {
+            // window.alert('注册成功！')
+            // 服务端重定向针对异步请求无效
+            window.location.href = '/index'
+          } else if (err_code === 1) {
+            window.alert('邮箱或者密码错误')
+          } else if (err_code === 500) {
+            window.alert('服务器忙，请稍后重试！')
+          }
+        }
+      })
+    })
+  </script>
+</body>
+</html>

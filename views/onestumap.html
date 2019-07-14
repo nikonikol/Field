@@ -1,0 +1,120 @@
+{{extend './layout.html'}}
+{{block 'link'}}
+<link rel="stylesheet" href="../public/css/map.css">
+<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css" />
+{{/block}}
+
+<!-- 连接选择 -->
+{{block 'select'}}
+<section class="content-header">
+    <h1>
+        地图
+        <small>信息</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 地图</a></li>
+        <li class="active">Here</li>
+    </ol>
+</section>
+{{/block}}
+
+{{block 'content'}}
+<section class="content">
+    <!-- 个人运动轨迹 -->
+    <div class="map" id="map">
+    
+    </div>
+    <div><input type="button" class="btn" value="开始动画" id="start" onclick="startAnimation()"/></div>
+    
+</section>
+
+
+
+{{/block}}
+
+
+{{block 'js'}}
+
+<!-- 加载地图JSAPI脚本 -->
+<script src="https://webapi.amap.com/maps?v=1.4.14&key=	ab969b0985106a6a6e83338a5595d02a"></script>
+<script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+<script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+<script>
+    //获取数据
+    var onemap = null
+
+    function getdata() {
+        $.ajax({
+            url: '/onemap',
+            type: 'post',
+            dataType: 'JSON',
+            //同步
+            async: false,
+            success: function (data) {
+                onemap = data.onemap
+            }
+        });
+    }
+    getdata()
+ 
+    var marker=[];
+    var lineArr = [];
+    for(i=0;i<JSON.parse(onemap[0].Location).count;i++)
+    {
+       marker.push([JSON.parse(onemap[0].Location).location[i].log, JSON.parse(onemap[0].Location).location[i].lat])
+      lineArr.push([JSON.parse(onemap[0].Location).location[i].log, JSON.parse(onemap[0].Location).location[i].lat])
+    }
+    
+
+   
+
+
+    //初始化地图
+    var map = new AMap.Map('map', {
+        resizeEnable: true, //是否监控地图容器尺寸变化
+        zoom: 13, //初始化地图层级
+        center: [JSON.parse(onemap[0].Location).location.slice(-1)[0].log, JSON.parse(onemap[0]
+            .Location).location.slice(-1)[0].lat] //初始化地图中心点
+    });
+
+    marker = new AMap.Marker({
+        map: map,
+        position: [JSON.parse(onemap[0].Location).location.slice(-1)[0].log, JSON.parse(onemap[0]
+            .Location).location.slice(-1)[0].lat],
+        icon: "https://webapi.amap.com/images/car.png",
+        offset: new AMap.Pixel(-26, -13),
+        autoRotation: true,
+        angle: -90,
+    });
+
+    // 绘制轨迹
+    var polyline = new AMap.Polyline({
+        map: map,
+        path: lineArr,
+        showDir: true,
+        strokeColor: "#28F", //线颜色
+        // strokeOpacity: 1,     //线透明度
+        strokeWeight: 6, //线宽
+        // strokeStyle: "solid"  //线样式
+    });
+
+    var passedPolyline = new AMap.Polyline({
+        map: map,
+        // path: lineArr,
+        strokeColor: "#AF5", //线颜色
+        // strokeOpacity: 1,     //线透明度
+        strokeWeight: 6, //线宽
+        // strokeStyle: "solid"  //线样式
+    });
+
+    marker.on('moving', function (e) {
+        passedPolyline.setPath(e.passedPath);
+    });
+
+    map.setFitView();
+
+    function startAnimation () {
+        marker.moveAlong(lineArr, 200);
+    }
+</script>
+{{/block}}

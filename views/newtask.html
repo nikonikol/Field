@@ -1,0 +1,133 @@
+{{extend './layout.html'}}
+
+
+{{block 'link'}}
+{{/block}}
+
+<!-- 连接选择 -->
+{{block 'select'}}
+<section class="content-header">
+    <h1>
+        新建任务
+        <small>信息</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 新建任务</a></li>
+        <li class="active">Here</li>
+    </ol>
+</section>
+{{/block}}
+
+{{block 'content'}}
+<section class="content">
+<div class="box box-primary">
+    <div class="box-header">
+        
+    </div>
+    <div class="box-body">
+        <form id='newtask_form'>
+            <div class="form-group">
+                <label class="change" for="taskname">名称</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" name="taskname" class="form-control formbg" id="taskname" placeholder="任务名称">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="change">班级</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <select name='class' class="form-control">
+                        {{each newtask}}
+                        <option>{{$value}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="change" for="fromtime">开始时间</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="date" name="fromtime" class="form-control formbg" id="fromtime" placeholder="开始时间">
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="change" for="endtime">结束时间</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="date" name="endtime" class="form-control formbg" id="endtime" placeholder="结束时间">
+                </div>
+                <!-- <label class="change" for="endtime">结束时间</label>
+                  <input type="date" name="endtime" class="form-control formbg" id="endtime" placeholder="结束时间"> -->
+            </div>
+
+            <div class="form-group">
+                <label class="change" for="address">地址</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" name="address" class="form-control formbg" id="address" placeholder="地址">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="change" for="">内容</label>
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <textarea name='taskcontent' class="form-control formbg" rows="5"></textarea>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success btn-block" type="submit">提交 </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+</section>
+{{/block}}
+
+
+{{block 'js'}}
+<script>
+    $('#newtask_form').on('submit', function (e) {
+        e.preventDefault()
+        var formData = $(this).serialize()
+        $.ajax({
+            url: '/newtask',
+            type: 'post',
+            data: formData,
+            dataType: 'json',
+            success: function (data) {
+                if (data.err_code === 0) {
+                    window.alert('添加成功')
+                    // 服务端重定向针对异步请求无效
+                    window.location.href = '/task'
+                } else if (data.err_code === 1) {
+                    window.alert('添加失败！')
+                } else if (data.err_code === 500) {
+                    window.alert('服务器忙，请稍后重试！')
+                }
+            }
+        })
+    })
+</script>
+
+{{/block}}

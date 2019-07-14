@@ -1,0 +1,24 @@
+.body{
+
+}
+
+.top-nav{
+     
+}
+
+.context{
+    overflow: hidden;
+    background-image:url(../../img/login.jpg); 
+}
+
+.right-login{
+    
+    
+    float: right;
+    padding:0px;
+    margin-right: 10%
+}
+
+.right-login .form{
+    background-color: aliceblue;
+}
