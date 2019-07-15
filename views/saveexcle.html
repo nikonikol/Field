@@ -1,0 +1,73 @@
+{{extend './layout.html'}}
+
+
+<!-- 连接块 -->
+{{block 'link'}}
+
+{{/block}}
+
+
+<!-- 连接选择 -->
+{{block 'select'}}
+<section class="content-header">
+        <h1>
+          学生信息
+          <small>信导入学生信息</small>
+        </h1>
+        <ol class="breadcrumb">
+          <li><a href="#"><i class="fa fa-dashboard"></i> 学生信息</a></li>
+          <li class="active">Here</li>
+        </ol>
+</section>
+{{/block}}
+
+<!-- 内容部分 -->
+{{block 'content'}}
+<section class="content">
+   
+        
+    <form id= "uploadForm" action= "http://localhost:4000/SaveExcle" method= "post" enctype ="multipart/form-data">    
+        <h1 >上传文件 </h1>    
+        <p >指定文件名： <input type ="text" name="filename" /></p>    
+        <p >上传文件： <input type ="file" name="file" id="fileId" /></p>    
+        <input type ="submit" value="上传" />    
+   </form>    
+
+   
+</section>
+{{/block}}
+
+<!-- js部分 -->
+{{block 'js'}}
+<script>
+    if('{{Success}}'!==''){
+        alert('{{Success}}')
+    }
+    function submit1(){
+        alert(1)
+        var objFile = document.getElementById("fileId").files
+        var params = new FormData();
+    params.append('file',objFile[0]);
+        alert(params)
+        $.ajax({    
+         url : "http://localhost:4000/SaveExcle",    
+         type : "POST",  
+         dataType:JSON,
+         data:params,
+         cache: false,
+         contentType: false,
+         processData: false,
+         success:function(data){
+             alert(data)
+            console.log(data)
+        }
+        })
+    }
+    
+   
+    </script>
+    
+{{/block}}
+
+
+

@@ -906,7 +906,8 @@ router.post('/SaveExcle', function (req, res) {
     //获取到要插入数据库的对象
     console.log(insertData)
 
-    //插入数据库
+    try {
+       //插入数据库
     for (i = 0; i < insertData.length; i++) {
         UserId = insertData[i].UserId
         Name = insertData[i].Name
@@ -916,68 +917,53 @@ router.post('/SaveExcle', function (req, res) {
         AddData(UserId, Name, Password, Nickname, Class)
     }
 
-    function AddData(UserId, Name, Password, Nickname, Class) {
-        console.log(UserId, Name, Password, Nickname, Class)
-        try {
-            searchsql = `SELECT
-            studentinfo.Name
-            FROM
-            studentinfo
-            WHERE
-            studentinfo.UserId = '` + UserId + `'`
+    res.render('saveexcle.html',{
+        Userinformation: req.session.Userinformation,
+        Success: '文件上传成功'
+    })
+        
+    } catch (err) {
+        console.log(err.message)
+        res.status(500).json({
+            code: 2,
+            err: err.message,
+            message: []
+        })
 
-            var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
-            var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Class) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','" + Class + "')"
-            mysql(searchsql, function (err, data) {
-                if (err) {
-
-                    return res.status(500).json({
-                        err_code: 500,
-                        message: err.message
-                    })
-                }
-                if (data[0] === undefined) {
-                    // 插入
-                    mysql(insectsql, function (err, data) {
-                        if (err) {
-
-                            return res.status(500).json({
-                                err_code: 500,
-                                message: err.message
-                            })
-                        }
-                    })
-                } else {
-                    //更新
-                    mysql(updatesql, function (err, data) {
-                        if (err) {
-
-                            return res.status(500).json({
-                                err_code: 500,
-                                message: err.message
-                            })
-                        }
-                    })
-                    // res.status(200).json({
-                    //     err_code: 0,
-                    //     message: 'OK'
-                    // })
-                }
-            })
-        } catch (err) {
-            return res.status(500).json({
-                code: 2,
-                err: err.message,
-                message: ''
-            })
-        }
+        res.render('saveexcle.html',{
+            Userinformation: req.session.Userinformation,
+            Success: '文件上传失败'
+        })
     }
 
-    return res.status(200).json({
-        code: 0,
-        error: 'success',
-        message: ""
-    })
+    
+    function AddData(UserId, Name, Password, Nickname, Class) {
+        console.log(UserId, Name, Password, Nickname, Class)
+        searchsql = `SELECT
+        studentinfo.Name
+        FROM
+        studentinfo
+        WHERE
+        studentinfo.UserId = '` + UserId + `'`
+
+        var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
+        var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Icon,Class,Role) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','http://k.zol-img.com.cn/sjbbs/7692/a7691515_s.jpg','" + Class + "',0)"
+
+        ;(async () => {
+      
+                const result = await mypinfoquery(searchsql)
+                if (result[0] === undefined) {
+                    // 插入
+                    await mypinfoquery(insectsql)
+                }
+                else{
+                    // 更新
+                    await mypinfoquery(updatesql)
+                }
+
+        })()
+
+    }
 })
 
 /**成绩统计路由 */
