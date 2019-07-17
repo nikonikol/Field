@@ -588,33 +588,32 @@ router.get('/correcttest', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
         return res.redirect('/')
     } else {
-        var taskid = req.query.TaskId
-        var userid = req.query.UserId
         var sql = null
+        var userid = req.session.Userinformation[0].UserId
         try {
             sql = `SELECT
-        testresult.UserId,
-        testresult.TaskId,
-        testresult.TestId,
-        testresult.Grade,
-        testresult.SubmitTime,
-        testresult.Answer,
-        testresult.Evaluate
-        FROM
-        testresult
-        WHERE
-        testresult.TaskId="` + taskid + `"AND
-        testresult.UserId="` + userid + `"
-        `
-            mysql(sql, function (err, correcttest) {
-                console.log(correcttest)
+        tasktable.TaskId,
+        tasktable.FromTime,
+        tasktable.EndTime,
+        tasktable.TaskName,
+        tasktable.Class,
+        tasktable.Address,
+        tasktable.TaskContent,
+        tasktable.Sponsor,
+        tasktable.TaskState
+    FROM
+        tasktable
+    WHERE
+        tasktable.Sponsor="` + userid + `"
+    `
+            mysql(sql, function (err, task) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
-                if (correcttest) {
+                if (task) {
                     res.render('correcttest.html', {
                         Userinformation: req.session.Userinformation,
-                        correcttest: correcttest
+                        task: task
                     })
                 }
             })
@@ -625,6 +624,44 @@ router.get('/correcttest', function (req, res) {
                 message: ''
             })
         }
+
+        // var taskid = req.query.TaskId
+        // var userid = req.query.UserId
+        // var sql = null
+        // try {
+        //     sql = `SELECT
+        // testresult.UserId,
+        // testresult.TaskId,
+        // testresult.TestId,
+        // testresult.Grade,
+        // testresult.SubmitTime,
+        // testresult.Answer,
+        // testresult.Evaluate
+        // FROM
+        // testresult
+        // WHERE
+        // testresult.TaskId="` + taskid + `"AND
+        // testresult.UserId="` + userid + `"
+        // `
+        //     mysql(sql, function (err, correcttest) {
+        //         console.log(correcttest)
+        //         if (err) {
+        //             return res.status(500).send('Server error')
+        //         }
+        //         if (correcttest) {
+        //             res.render('correcttest.html', {
+        //                 Userinformation: req.session.Userinformation,
+        //                 correcttest: correcttest
+        //             })
+        //         }
+        //     })
+        // } catch (err) {
+        //     res.status(500).json({
+        //         code: 2,
+        //         err: err.message,
+        //         message: ''
+        //     })
+        // }
     }
 })
 

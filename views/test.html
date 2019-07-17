@@ -39,10 +39,10 @@
                                 aria-describedby="example2_info">
                                 <thead>
                                     <tr role="row">
-                                        <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
+                                        <!-- <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Rendering engine: activate to sort column descending"
-                                            aria-sort="ascending">编号</th>
+                                            aria-sort="ascending">编号</th> -->
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Browser: activate to sort column ascending">已完成
                                         </th>
@@ -65,7 +65,7 @@
                                 <tbody>
                                     {{each test}}
                                     <tr>
-                                            <td class="mailbox-star">{{$value.Testid}}</td>
+                                            <!-- <td class="mailbox-star">{{$value.Testid}}</td> -->
                                             <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
                                             <td class="mailbox-name"><a href="/test?Testid={{$value.TaskId}}">{{$value.TestName}}</a></td>
                                             <td class="mailbox-subject"><b>{{$value.Content}}</b> 

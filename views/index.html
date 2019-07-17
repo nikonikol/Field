@@ -24,21 +24,143 @@
 <!-- 内容部分 -->
 {{block 'content'}}
 <section class="content">
-    <h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, nisi enim? Totam, quibusdam beatae esse aut incidunt eius tempora aperiam animi molestias quae ducimus voluptatibus eum, commodi delectus temporibus fugit?
-    </h1>
-    <h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, nisi enim? Totam, quibusdam beatae esse aut incidunt eius tempora aperiam animi molestias quae ducimus voluptatibus eum, commodi delectus temporibus fugit?
-    </h1>
-    <h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, nisi enim? Totam, quibusdam beatae esse aut incidunt eius tempora aperiam animi molestias quae ducimus voluptatibus eum, commodi delectus temporibus fugit?
-    </h1>
-    <h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, nisi enim? Totam, quibusdam beatae esse aut incidunt eius tempora aperiam animi molestias quae ducimus voluptatibus eum, commodi delectus temporibus fugit?
-    </h1>
-    <h1>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni, nisi enim? Totam, quibusdam beatae esse aut incidunt eius tempora aperiam animi molestias quae ducimus voluptatibus eum, commodi delectus temporibus fugit?
-    </h1>
+    <div class="box box-primary">
+        <div class="box-header">
+            
+        </div>
+        <div class="box-body">
+            <div class="row">
+                <div class="col-lg-3 col-xs-6">
+                  <!-- small box -->
+                  <div class="small-box bg-aqua">
+                    <div class="inner">
+                      <h3>150</h3>
+        
+                      <p>正在进行的任务</p>
+                    </div>
+                    <div class="icon">
+                      <i class="fa fa-shopping-cart"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                      More info <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                  </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-xs-6">
+                  <!-- small box -->
+                  <div class="small-box bg-green">
+                    <div class="inner">
+                      <h3>53<sup style="font-size: 20px">%</sup></h3>
+        
+                      <p>已经完成的任务</p>
+                    </div>
+                    <div class="icon">
+                      <i class="ion ion-stats-bars"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                      More info <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                  </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-xs-6">
+                  <!-- small box -->
+                  <div class="small-box bg-yellow">
+                    <div class="inner">
+                      <h3>44</h3>
+        
+                      <p>班级详情</p>
+                    </div>
+                    <div class="icon">
+                      <i class="ion ion-person-add"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                      More info <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                  </div>
+                </div>
+                <!-- ./col -->
+                <div class="col-lg-3 col-xs-6">
+                  <!-- small box -->
+                  <div class="small-box bg-red">
+                    <div class="inner">
+                      <h3>65</h3>
+        
+                      <p>成绩统计</p>
+                    </div>
+                    <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                      More info <i class="fa fa-arrow-circle-right"></i>
+                    </a>
+                  </div>
+                </div>
+                <!-- ./col -->
+              </div>
+            {{each correcttest}}
+            <form id='correcttest_form'>
+                <div class="form-group">
+                    <label class="change" for="UserId">测试</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" name="TestId" class="form-control formbg" id="TestId" placeholder="{{$value.TestId}}" disabled>
+                    </div>
+    
+                </div>
+                <div class="form-group">
+                    <label class="change">答案</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" name="Answer" class="form-control formbg" id="Answer" placeholder="{{$value.Answer}}" disabled>
+                    </div>
+    
+                </div>
+    
+                <div class="form-group">
+                    <label class="change" for="fromtime">提交时间</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="text" name="SubmitTime" class="form-control formbg" id="SubmitTime" placeholder="{{$value.SubmitTime}}" disabled>
+                    </div>
+    
+                </div>
+    
+                <div class="form-group">
+                    <label class="change" for="address">打分</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <input type="number" name="grade" class="form-control formbg" id="grade" placeholder="分数">
+                    </div>
+    
+                </div>
+                <div class="form-group">
+                    <label class="change" for="">批注</label>
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <textarea name='correctcontent' class="form-control formbg" rows="5"></textarea>
+                    </div>
+    
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success btn-block" type="submit">提交 </button>
+                </div>
+    
+            </form>
+            {{/each}}
+        </div>
+    </div>
 </section>
 {{/block}}
 
