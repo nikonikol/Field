@@ -598,7 +598,6 @@ router.get('/correcttest', function (req, res) {
         var userid = req.session.Userinformation[0].UserId
         try {
             sql = `SELECT
-<<<<<<< HEAD
         tasktable.TaskId,
         tasktable.FromTime,
         tasktable.EndTime,
@@ -614,23 +613,6 @@ router.get('/correcttest', function (req, res) {
         tasktable.Sponsor="` + userid + `"
     `
             mysql(sql, function (err, task) {
-=======
-        testresult.UserId,
-        testresult.TaskId,
-        testresult.TestId,
-        testresult.Grade,
-        testresult.SubmitTime,
-        testresult.Answer,
-        testresult.Evaluate
-        FROM
-        testresult
-        WHERE
-        testresult.TaskId="` + taskid + `"AND
-        testresult.UserId="` + userid + `"
-        `
-            infoquery(sql, function (err, correcttest) {
-                console.log(correcttest)
->>>>>>> 522c3eb9f503f78a30fd759363fc58c75c9f6f49
                 if (err) {
                     return res.status(500).send('Server error')
                 }
