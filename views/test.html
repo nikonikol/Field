@@ -12,8 +12,8 @@
         <small>信息</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> 测试</a></li>
-        <li class="active">Here</li>
+        <li><a href="/task"><i class="fa fa-dashboard"></i> 任务</a></li>
+        <li class="active">测试</li>
     </ol>
 </section>
 {{/block}}
@@ -67,7 +67,7 @@
                                     <tr>
                                             <td class="mailbox-star">{{$value.Testid}}</td>
                                             <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
-                                            <td class="mailbox-name"><a href="/test?Testid={{$value.TaskId}}">{{$value.TestName}}</a></td>
+                                            <td class="mailbox-name"><a href="#">{{$value.TestName}}</a></td>
                                             <td class="mailbox-subject"><b>{{$value.Content}}</b> 
                                             </td>
                                             <td class="mailbox-attachment">{{$value.Deadtime}}</td>

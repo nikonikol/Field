@@ -11,7 +11,7 @@ var fs = require('fs')
 //加载express，包装路由
 var express = require('express')
 //加载mysql.js
-var mysql = require('./models/mysql')
+var inquery = require('./models/mysql')
 //加载md5插件
 var md5 = require('blueimp-md5')
 //加载运算函数
@@ -19,7 +19,7 @@ var calbulk= require('./public/js/cal.js')
 //promise函数
 function mypinfoquery(sql) {
     return new Promise(function (resolve, reject) {
-        mysql(sql, (err, data) => {
+        inquery(sql, (err, data) => {
             if (err) {
                 reject(err)
             }
@@ -60,7 +60,7 @@ router.post('/', function (req, res) {
         studentinfo.Password="` + password + `"AND
         studentinfo.role=1
         `
-        mysql(sql, function (err, data) {
+        inquery(sql, function (err, data) {
             console.log(data)
             if (err) {
                 return res.status(500).json({
@@ -121,7 +121,7 @@ router.get('/selfinformation', function (req, res) {
         WHERE
             studentinfo.UserId="` + userid + `"
         `
-            mysql(sql, function (err, selfinformation) {
+            inquery(sql, function (err, selfinformation) {
                 console.log(selfinformation)
                 if (err) {
                     return res.status(500).send('Server error')
@@ -156,7 +156,7 @@ router.post('/selfinformation', function (req, res) {
         studentinfo.UserId="` + userid + `"
         
         `
-        mysql(sql, function (err) {
+        inquery(sql, function (err) {
             if (err) {
                 return res.status(200).json({
                     err_code: 1,
@@ -205,7 +205,7 @@ router.get('/index', function (req, res) {
         WHERE
         tasktable.Sponsor="` + userid + `"
     `
-        mysql(sql, function (err, data) {
+        inquery(sql, function (err, data) {
             if (err) {
                 return res.status(500).json({
                     err_code: 500,
@@ -232,7 +232,7 @@ router.get('/index', function (req, res) {
                 WHERE
                 studentinfo.Class = '` + teacherclass[i] + `' 
                `
-                mysql(sqlclass, function (err, data) {
+                inquery(sqlclass, function (err, data) {
                     if (err) {
                         return res.status(500).json({
                             err_code: 500,
@@ -287,11 +287,17 @@ router.get('/task', function (req, res) {
     WHERE
         tasktable.Sponsor="` + userid + `"
     `
-            mysql(sql, function (err, task) {
+            inquery(sql, function (err, task) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
                 if (task) {
+                    for (var i = 0; i < task.length; i++) {
+                    //把时间转换
+                    task[i].FromTime=task[i].FromTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                    task[i].EndTime=task[i].EndTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                    }
+                    
                     res.render('task.html', {
                         Userinformation: req.session.Userinformation,
                         task: task
@@ -324,7 +330,7 @@ router.get('/newtask', function (req, res) {
     WHERE
         studentinfo.UserId="` + userid + `"
     `
-            mysql(sql, function (err, newtask) {
+            inquery(sql, function (err, newtask) {
                 newtask = newtask[0].Class.split(',')
                 if (err) {
                     return res.status(500).send('Server error')
@@ -362,7 +368,7 @@ router.post('/newtask', function (req, res) {
         VALUES
         ("` + taskstate + `","` + sponsor + `","` + taskcontent + `","` + address + `","` + grade + `","` + taskname + `","` + endtime + `","` + fromtime + `",0)
         `
-        mysql(sql, function (err) {
+        inquery(sql, function (err) {
             if (err) {
                 return res.status(200).json({
                     err_code: 1,
@@ -399,7 +405,7 @@ router.get('/deletetask', function (req, res) {
     WHERE
     tasktable.TaskId="` + taskid + `"
     `
-                mysql(sql, function (err) {
+                inquery(sql, function (err) {
                     if (err) {
                         return res.status(500).send('Server error')
                     }
@@ -440,7 +446,7 @@ router.get('/deletetask', function (req, res) {
         WHERE
         testtable.TaskId="` + taskid + `"
         `
-                mysql(sql, function (err, test) {
+                inquery(sql, function (err, test) {
                     if (err) {
                         return res.status(500).send('Server error')
                     }
@@ -481,7 +487,7 @@ router.get('/newtest', function (req, res) {
         WHERE
         testtable.TaskId="` + taskid + `"
         `
-            mysql(sql, function (err, newtest) {
+            inquery(sql, function (err, newtest) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
@@ -516,7 +522,7 @@ router.post('/newtest', function (req, res) {
         VALUES
         ("` + testname + `","` + taskid + `","` + testcontent + `","` + totalgrade + `","` + deadtime + `",0)
         `
-        mysql(sql, function (err, data) {
+        inquery(sql, function (err, data) {
             if (err) {
 
                 return res.status(200).json({
@@ -567,7 +573,7 @@ router.get('/deletetest', function (req, res) {
         WHERE
         testtable.TestId="` + testid + `"
         `
-            mysql(sql, function (err, data) {
+            inquery(sql, function (err, data) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
@@ -606,7 +612,7 @@ router.get('/correcttest', function (req, res) {
         testresult.TaskId="` + taskid + `"AND
         testresult.UserId="` + userid + `"
         `
-            mysql(sql, function (err, correcttest) {
+            inquery(sql, function (err, correcttest) {
                 console.log(correcttest)
                 if (err) {
                     return res.status(500).send('Server error')
@@ -638,7 +644,7 @@ router.post('/correcttest', function (req, res) {
         SET 
         
         `
-        mysql(sql, function (err, data) {
+        inquery(sql, function (err, data) {
             if (err) {
 
                 return res.status(200).json({
@@ -691,7 +697,7 @@ router.get('/studenttask', function (req, res) {
         ORDER BY
         studentinfo.UserId
         `
-            mysql(sql, function (err, studata) {
+            inquery(sql, function (err, studata) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
@@ -734,7 +740,7 @@ router.get('/allstudent', function (req, res) {
                 WHERE
                 studentinfo.Class = '` + teacherclass[i] + `' 
                `
-            mysql(sqlclass, function (err, data) {
+            inquery(sqlclass, function (err, data) {
                 if (err) {
                     return res.status(500).json({
                         err_code: 500,
@@ -765,6 +771,52 @@ router.get('/allstudent', function (req, res) {
 /**
  * 地图操作
  */
+
+//显示地图，先进入选择任务界面
+router.get('/map', function (req, res) {
+    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+        return res.redirect('/')
+    } else {
+        var sql = null
+        var userid = req.session.Userinformation[0].UserId
+        try {
+            sql = `SELECT
+        tasktable.TaskId,
+        tasktable.FromTime,
+        tasktable.EndTime,
+        tasktable.TaskName,
+        tasktable.Class,
+        tasktable.Address,
+        tasktable.TaskContent,
+        tasktable.Sponsor,
+        tasktable.TaskState
+    FROM
+        tasktable
+    WHERE
+        tasktable.Sponsor="` + userid + `"
+    `
+            inquery(sql, function (err, map) {
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (map) {
+                    res.render('map.html', {
+                        Userinformation: req.session.Userinformation,
+                        map: map
+                    })
+                }
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
+
+    }
+})
+
 //显示全部人员位置信息
 router.get('/taskmap', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
@@ -793,7 +845,7 @@ router.get('/taskmap', function (req, res) {
         location.TaskId = "` + taskid + `" AND
         studentinfo.UserId = location.UserId
         `
-            mysql(sql, function (err, taskmap) {
+            inquery(sql, function (err, taskmap) {
                 //获取最后一个值 
                 // console.log(JSON.parse(taskmap[0].Location).location.slice(-1)[0].log)
                 if (err) {
@@ -829,7 +881,8 @@ router.get('/onemap', function (req, res) {
 })
 
 router.post('/onemap', function (req, res) {
-    var userid = parseInt(req.headers.referer.split('=').slice(1, 2)[0])
+    var userid = req.headers.referer.split('=').slice(1, 2)[0]
+    console.log(userid)
     try {
         sql = `SELECT
         studentinfo.Name,
@@ -844,7 +897,7 @@ router.post('/onemap', function (req, res) {
         location.UserId = "` + userid + `" AND
         studentinfo.UserId = location.UserId
         `
-        mysql(sql, function (err, onemap) {
+        inquery(sql, function (err, onemap) {
             if (err) {
                 return res.status(500).send('Server error')
             }
@@ -928,7 +981,7 @@ router.post('/SaveExcle', function (req, res) {
 
             var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
             var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Class) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','" + Class + "')"
-            mysql(searchsql, function (err, data) {
+            inquery(searchsql, function (err, data) {
                 if (err) {
 
                     return res.status(500).json({
@@ -938,7 +991,7 @@ router.post('/SaveExcle', function (req, res) {
                 }
                 if (data[0] === undefined) {
                     // 插入
-                    mysql(insectsql, function (err, data) {
+                    inquery(insectsql, function (err, data) {
                         if (err) {
 
                             return res.status(500).json({
@@ -949,7 +1002,7 @@ router.post('/SaveExcle', function (req, res) {
                     })
                 } else {
                     //更新
-                    mysql(updatesql, function (err, data) {
+                    inquery(updatesql, function (err, data) {
                         if (err) {
 
                             return res.status(500).json({
