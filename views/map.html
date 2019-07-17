@@ -8,24 +8,61 @@
 {{block 'select'}}
 <section class="content-header">
     <h1>
-        测试
+        地图
         <small>信息</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="/task"><i class="fa fa-dashboard"></i> 任务</a></li>
-        <li class="active">测试</li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> 地图</a></li>
+        <li class="active">Here</li>
     </ol>
 </section>
 {{/block}}
 
 {{block 'content'}}
-
+<!-- <div class="container">
+<div class="header">
+    <h1 class="float-left"><a href="/newtask"> 新建任务</a></h1>
+    <div class="float-right">
+            <input type="text" class="input float-right" placeholder="Search Mail">
+    </div>
+</div>
+<div class="box box-primary">        
+          <div class="" id='task'>
+            <table class="table table-hover">
+              <tbody>
+            {{each task}}
+              <tr >
+                <td class="mailbox-star">{{$value.TaskId}}</td>
+                <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
+                <td class="mailbox-name"><a href="/studenttask?class={{$value.Class}}">{{$value.TaskName}}</a></td>
+                <td class="mailbox-subject"><b>{{$value.FromTime}}</b> 
+                </td>
+                <td class="mailbox-subject"><b>{{$value.EndTime}}</b> 
+                </td>
+                <td class="mailbox-attachment">{{$value.Class}}</td>
+                <td class="mailbox-date">{{$value.TaskState}}</td>
+                <td class="mailbox-star ">
+                <div class="float"> 
+                  <div class="float-left"><a href="/test?Taskid={{$value.TaskId}}">测试</a></div>
+                  <div class="float-right"><a href="/taskmap?Taskid={{$value.TaskId}}">地图</a></div>
+                </div>
+                </td>
+                <td>
+                    <div class="float-right"><a href="/deletetask?Taskid={{$value.TaskId}}">删除</a></div> 
+                </td>
+              </tr>
+              {{/each}} 
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div> -->
 <section class="content">
     <div class="row">
         <div class="box">
-            <div class="box-header">
-                <a class="box-title" href="/newtest?Taskid={{test[0].TaskId}}">新建测试</a>
-            </div>
+            <!-- <div class="box-header">
+                <a class="box-title" href="/newtask">新建任务</a>
+            </div> -->
             <!-- /.box-header -->
             <div class="box-body">
                 <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
@@ -39,10 +76,10 @@
                                 aria-describedby="example2_info">
                                 <thead>
                                     <tr role="row">
-                                        <!-- <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
+                                        <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1"
                                             aria-label="Rendering engine: activate to sort column descending"
-                                            aria-sort="ascending">编号</th> -->
+                                            aria-sort="ascending">编号</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Browser: activate to sort column ascending">已完成
                                         </th>
@@ -51,32 +88,49 @@
                                             任务名称</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Engine version: activate to sort column ascending">
-                                            任务内容</th>
+                                            开始时间</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">截止时间</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">班级</th>
+                                        <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">成绩统计</th> -->
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">地图</th>
+                                        <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">测试</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">修改</th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">删除</th>
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">删除</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
-                                    {{each test}}
+                                    {{each map}}
                                     <tr>
-                                            <!-- <td class="mailbox-star">{{$value.Testid}}</td> -->
-                                            <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
-                                            <td class="mailbox-name"><a href="#">{{$value.TestName}}</a></td>
-                                            <td class="mailbox-subject"><b>{{$value.Content}}</b> 
-                                            </td>
-                                            <td class="mailbox-attachment">{{$value.Deadtime}}</td>
-                                            <td class="mailbox-date">{{$value.TotalGrade}}</td>
-                                            <td class="mailbox-date">
-                                            <a href="/deletetest?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">修改</a>
-                                            <td class="mailbox-date">
-                                            <a href="/deletetest?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">删除</a>
+                                    <td class="mailbox-star">{{$value.TaskId}}</td>
+                                    <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
+                                    <td class="mailbox-name">
+                                    <a href="/studenttask?class={{$value.Class}}&taskid={{$value.TaskId}}">{{$value.TaskName}}</a></td>
+                                    <td class="mailbox-subject"><b>{{$value.FromTime}}</b>
+                                    </td>
+                                    <td class="mailbox-subject"><b>{{$value.EndTime}}</b>
+                                    </td>
+                                    <td class="mailbox-attachment">{{$value.Class}}</td>
+                                    <!-- <td class="mailbox-star ">                                           
+                                            <div class="float-right"><a href="/gradedisplay?TaskId={{$value.TaskId}}">成绩统计</a>
+                                            </div>
+                                    </td>  -->
+                                    <td class="mailbox-star ">                                          
+                                            <div class="float-right"><a href="/taskmap?Taskid={{$value.TaskId}}">地图</a>
+                                            </div>
+                                    </td>
+                                    <!-- <td class="mailbox-star ">
+                                            <div class="float-left"><a href="/test?Taskid={{$value.TaskId}}">测试</a>
+                                            </div>
+                                    </td> -->
+                                    <!-- <td>
+                                        <div class="float-right"><a href="/deletetask?Taskid={{$value.TaskId}}">删除</a>
+                                        </div>
+                                    </td> -->
                                 </tr>
                                     {{/each}}
                                 </tbody>

@@ -12,8 +12,8 @@
         <small>信息</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> 任务</a></li>
-        <li class="active">Here</li>
+        <li><a href="/index"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li class="active">任务</li>
     </ol>
 </section>
 {{/block}}
@@ -95,8 +95,8 @@
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">班级</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">成绩统计</th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">地图</th>
+                                        <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">地图</th> -->
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">测试</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
@@ -119,10 +119,10 @@
                                             <div class="float-right"><a href="/gradedisplay?TaskId={{$value.TaskId}}">成绩统计</a>
                                             </div>
                                     </td>
-                                    <td class="mailbox-star ">                                           
+                                    <!-- <td class="mailbox-star ">                                           
                                             <div class="float-right"><a href="/taskmap?Taskid={{$value.TaskId}}">地图</a>
                                             </div>
-                                    </td>
+                                    </td> -->
                                     <td class="mailbox-star ">
                                             <div class="float-left"><a href="/test?Taskid={{$value.TaskId}}">测试</a>
                                             </div>
