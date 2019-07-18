@@ -76,12 +76,9 @@
                                 aria-describedby="example2_info">
                                 <thead>
                                     <tr role="row">
-                                        <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
-                                            aria-label="Rendering engine: activate to sort column descending"
-                                            aria-sort="ascending">编号</th>
+                                    
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="Browser: activate to sort column ascending">已完成
+                                            colspan="1" aria-label="Browser: activate to sort column ascending">任务状态
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Platform(s): activate to sort column ascending">
@@ -106,8 +103,8 @@
                                 <tbody>
                                     {{each map}}
                                     <tr>
-                                    <td class="mailbox-star">{{$value.TaskId}}</td>
-                                    <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
+                                    <!-- <td class="mailbox-star">{{$value.TaskId}}</td> -->
+                                    <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a>{{$value.TaskState==1?'完成':'未完成'}}</td>
                                     <td class="mailbox-name">
                                     <a href="/studenttask?class={{$value.Class}}&taskid={{$value.TaskId}}">{{$value.TaskName}}</a></td>
                                     <td class="mailbox-subject"><b>{{$value.FromTime}}</b>
@@ -138,7 +135,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-sm-5">
                             <div class="dataTables_info" id="example2_info" role="status" aria-live="polite"></div>
                         </div>
@@ -164,7 +161,7 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <!-- /.box-body -->

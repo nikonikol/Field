@@ -8,12 +8,12 @@
 {{block 'select'}}
 <section class="content-header">
     <h1>
-        任务
+        地图
         <small>信息</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="/index"><i class="fa fa-dashboard"></i> 首页</a></li>
-        <li class="active">任务</li>
+        <li><a href="#"><i class="fa fa-dashboard"></i> 地图</a></li>
+        <li class="active">Here</li>
     </ol>
 </section>
 {{/block}}
@@ -60,9 +60,9 @@
 <section class="content">
     <div class="row">
         <div class="box">
-            <div class="box-header">
+            <!-- <div class="box-header">
                 <a class="box-title" href="/newtask">新建任务</a>
-            </div>
+            </div> -->
             <!-- /.box-header -->
             <div class="box-body">
                 <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
@@ -76,66 +76,58 @@
                                 aria-describedby="example2_info">
                                 <thead>
                                     <tr role="row">
-                                        <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1"
-                                            aria-label="Rendering engine: activate to sort column descending"
-                                            aria-sort="ascending">任务名称</th>
+                                    
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Browser: activate to sort column ascending">任务状态
                                         </th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Platform(s): activate to sort column ascending">
-                                            任务内容</th>
+                                            任务名称</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="Engine version: activate to sort column ascending">
                                             开始时间</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">截止时间</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">参与班级</th>
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">班级</th>
                                         <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
                                             colspan="1" aria-label="CSS grade: activate to sort column ascending">成绩统计</th> -->
+                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">地图</th>
                                         <!-- <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">地图</th> -->
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">测试</th>
                                         <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">实习地点</th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">查看测试</th>
-                                        <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1"
-                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">删除</th>
+                                            colspan="1" aria-label="CSS grade: activate to sort column ascending">删除</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{each task}}
+                                    {{each map}}
                                     <tr>
-                                    <td class="mailbox-star">{{$value.TaskName}}</td>
+                                    <!-- <td class="mailbox-star">{{$value.TaskId}}</td> -->
                                     <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a>{{$value.TaskState==1?'完成':'未完成'}}</td>
-                                    <td class="mailbox-star"><a href="#"></a>{{$value.TaskContent}}</td>
+                                    <td class="mailbox-name">
+                                    <a href="/studenttask?class={{$value.Class}}&taskid={{$value.TaskId}}">{{$value.TaskName}}</a></td>
                                     <td class="mailbox-subject"><b>{{$value.FromTime}}</b>
                                     </td>
                                     <td class="mailbox-subject"><b>{{$value.EndTime}}</b>
                                     </td>
-                                    <td class="mailbox-name">
-                                    <a href="/studenttask?class={{$value.Class}}&taskid={{$value.TaskId}}">{{$value.Class}}</a></td>
-                                    <td class="mailbox-attachment">{{$value.Address}}</td>
-                                    <td class="mailbox-star ">
-                                            <div class="float-left"><a href="/test?Taskid={{$value.TaskId}}">查看测试</a>
-                                            </div>
-                                    </td>
-                                    
+                                    <td class="mailbox-attachment">{{$value.Class}}</td>
                                     <!-- <td class="mailbox-star ">                                           
                                             <div class="float-right"><a href="/gradedisplay?TaskId={{$value.TaskId}}">成绩统计</a>
                                             </div>
-                                    </td> -->
-                                    <!-- <td class="mailbox-star ">                                           
-                                            <div class="float-right"><a href="/taskmap?Taskid={{$value.TaskId}}">地图</a>
+                                    </td>  -->
+                                    <td class="mailbox-star ">                                          
+                                            <div class="float-right"><a href="gradedisplay?TaskId={{$value.TaskId}}">成绩统计</a>
+                                            </div>
+                                    </td>
+                                    <!-- <td class="mailbox-star ">
+                                            <div class="float-left"><a href="/test?Taskid={{$value.TaskId}}">测试</a>
                                             </div>
                                     </td> -->
-                                   
-                                    <td>
-                                        <div class="float-right"><a href="/deletetask?Taskid={{$value.TaskId}}">删除任务</a>
+                                    <!-- <td>
+                                        <div class="float-right"><a href="/deletetask?Taskid={{$value.TaskId}}">删除</a>
                                         </div>
-                                    </td>
+                                    </td> -->
                                 </tr>
                                     {{/each}}
                                 </tbody>
@@ -178,8 +170,4 @@
 </section>
 {{/block}}
 {{block 'js'}}
-<script src="../public/js/vue.js"></script>
-<script>
-
-</script>
 {{/block}}

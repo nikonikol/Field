@@ -23,6 +23,7 @@
 
 <!-- 内容部分 -->
 {{block 'content'}}
+<link rel="stylesheet" href="../public/dist/css/bootstrap-datepicker3.css">
 <section class="content">
     <div class="box box-primary">
         <div class="box-header">
@@ -34,7 +35,7 @@
                   <!-- small box -->
                   <div class="small-box bg-aqua">
                     <div class="inner">
-                      <h3>150</h3>
+                      <h3></h3>
         
                       <p>正在进行的任务</p>
                     </div>
@@ -51,7 +52,7 @@
                   <!-- small box -->
                   <div class="small-box bg-green">
                     <div class="inner">
-                      <h3>53<sup style="font-size: 20px">%</sup></h3>
+                      <h3><sup style="font-size: 20px"></sup></h3>
         
                       <p>已经完成的任务</p>
                     </div>
@@ -68,7 +69,7 @@
                   <!-- small box -->
                   <div class="small-box bg-yellow">
                     <div class="inner">
-                      <h3>44</h3>
+                      <h3></h3>
         
                       <p>班级详情</p>
                     </div>
@@ -85,7 +86,7 @@
                   <!-- small box -->
                   <div class="small-box bg-red">
                     <div class="inner">
-                      <h3>65</h3>
+                      <h3></h3>
         
                       <p>成绩统计</p>
                     </div>
@@ -99,6 +100,94 @@
                 </div>
                 <!-- ./col -->
               </div>
+
+              <div class="row">
+                  <div class="top-context col-sm-6" style="background-color: seashell">
+                      <iframe scrolling="yes" src="https://tianqiapi.com/api.php?style=tw&skin=pitaya" frameborder="0" width="100% "
+                        height="393" allowtransparency="true" )></iframe>
+                      <!-- </div>
+                      中--
+                      <div class="center-context"> -->
+                    </div>
+
+                    <div class="col-sm-6">
+                        <div class="box box-solid bg-green-gradient">
+                            <div class="box-header">
+                              <i class="fa fa-calendar"></i>
+                
+                              <h3 class="box-title">Calendar</h3>
+                              <!-- tools box -->
+                              <div class="pull-right box-tools">
+                                <!-- button with a dropdown -->
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-bars"></i></button>
+                                  <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href="#">Add new event</a></li>
+                                    <li><a href="#">Clear events</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">View calendar</a></li>
+                                  </ul>
+                                </div>
+                                <button type="button" class="btn btn-success btn-sm" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" data-widget="remove"><i class="fa fa-times"></i>
+                                </button>
+                              </div>
+                              <!-- /. tools -->
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body no-padding">
+                              <!--The calendar -->
+                              <div id="calendar" style="width: 100%"></div>
+                            </div>
+                            <!-- /.box-body -->
+                            <div class="box-footer text-black">
+                              <div class="row">
+                                <div class="col-sm-6">
+                                  <!-- Progress bars -->
+                                  <div class="clearfix">
+                                    <span class="pull-left">Task #1</span>
+                                    <small class="pull-right">90%</small>
+                                  </div>
+                                  <div class="progress xs">
+                                    <div class="progress-bar progress-bar-green" style="width: 90%;"></div>
+                                  </div>
+                
+                                  <div class="clearfix">
+                                    <span class="pull-left">Task #2</span>
+                                    <small class="pull-right">70%</small>
+                                  </div>
+                                  <div class="progress xs">
+                                    <div class="progress-bar progress-bar-green" style="width: 70%;"></div>
+                                  </div>
+                                </div>
+                                <!-- /.col -->
+                                <div class="col-sm-6">
+                                  <div class="clearfix">
+                                    <span class="pull-left">Task #3</span>
+                                    <small class="pull-right">60%</small>
+                                  </div>
+                                  <div class="progress xs">
+                                    <div class="progress-bar progress-bar-green" style="width: 60%;"></div>
+                                  </div>
+                
+                                  <div class="clearfix">
+                                    <span class="pull-left">Task #4</span>
+                                    <small class="pull-right">40%</small>
+                                  </div>
+                                  <div class="progress xs">
+                                    <div class="progress-bar progress-bar-green" style="width: 40%;"></div>
+                                  </div>
+                                </div>
+                                <!-- /.col -->
+                              </div>
+                              <!-- /.row -->
+                            </div>
+                          </div>
+                    </div>
+              </div>
+             
             {{each correcttest}}
             <form id='correcttest_form'>
                 <div class="form-group">
@@ -157,7 +246,9 @@
                     <button class="btn btn-success btn-block" type="submit">提交 </button>
                 </div>
     
+                
             </form>
+      
             {{/each}}
         </div>
     </div>
@@ -166,5 +257,6 @@
 
 <!-- js部分 -->
 {{block 'js'}}
-
+<script src="../public/dist/js/bootstrap-datepicker.js"></script>
+<script>$('#calendar').datepicker();</script>
 {{/block}}

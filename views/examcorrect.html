@@ -21,7 +21,7 @@
 {{block 'content'}}
 
 <section class="content">
-    <div class="row">
+    <div class="row" id="app">
         <div class="box">
             <!-- /.box-header -->
             <div class="box-body">
@@ -66,6 +66,7 @@
                                 <tbody>
 
                                     {{each ExamList}}
+
                                     <tr>
                                         <!-- <td class="mailbox-star">{{$value.Testid}}</td> -->
                                         <td class="mailbox-star"><a href="#">{{$value.Name}}</td>
@@ -75,18 +76,23 @@
                                         <td class="mailbox-attachment">{{$value.Answer}}</td>
                                         <!-- <td class="mailbox-date">{{$value.TotalGrade}}</td> -->
                                         <td class="mailbox-date">
-                                            <input  type="number" name="" id="app" min="0" max="{{$value.TotalGrade}}" v-model="name">
+                                            <input type="number" name="" id="{{$index}}" min="0"
+                                                max="{{$value.TotalGrade}}" v-on:change="inputgrade({{$index}},{{$value.Testid}},{{$value.TaskId}},{{$value.UserId}})">
                                             <!-- <a href="/correctexam?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">批改测试</a> -->
                                         <td class="mailbox-date">
-                                            <input type="text" name="" id="">
+                                            <input type="text" name="" id="comment{{$index}}"
+                                                v-on:change="inputcomment({{$index}})">
                                     </tr>
                                     {{/each}}
+
+
                                 </tbody>
 
                             </table>
+                            <button class="btn btn-info btn-block" @click="submit()">上传成绩</button>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-sm-5">
                             <div class="dataTables_info" id="example2_info" role="status" aria-live="polite"></div>
                         </div>
@@ -112,7 +118,7 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <!-- /.box-body -->
@@ -123,16 +129,70 @@
 
 {{block 'js'}}
 
-<script>
-   var vm =new Vue({
-            el:'#app',
-            data:{
-                grade:4
-            },
+<script src="../public/js/vue.js"></script>
 
-            methods: {
+<script>
+    var number = '{{ExamList.length}}'
+    var gradearry = new Array(Number(number))
+    var commentarry = new Array(Number(number))
+    var TaskID = new Array(Number(number))
+    var TestID = new Array(Number(number))
+    var UserID = new Array(Number(number))
+    var vm = new Vue({
+        el: '#app',
+        data: {},
+
+        methods: {
+            submit() {
+                var Isnull = false
+                for (i = 0; i < gradearry.length; i++) {
+                    if (gradearry[i] == undefined && commentarry[i] == undefined) {
+                        Isnull = true
+                    }
+                }
+                if (Isnull) {
+                    alert('请检查是否给每个学生都已经批改和评论')
+                } else {
+                    $.ajax({
+                        url: '/correctexam',
+                        type: 'post',
+                        data: {
+                            'gradelist':gradearry.toString(),
+                            'commentlist':commentarry.toString(),
+                            'TaskID':TaskID.toString(),
+                            'UserID':UserID.toString(),
+                            'TestID':TestID.toString()
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            var err_code = data.err_code
+                            if (err_code === 0) {
+                                window.alert('批改成功')
+                                window.location.href = '/correcttest'
+                            } else if (err_code === 1) {
+                                window.alert('批改失败，请稍后重试')
+                            } else if (err_code === 500) {
+                                window.alert('服务器忙，请稍后重试！')
+                            }
+                        }
+                    })
                 
-            }
-        });
+            
+        }
+
+    },
+    inputgrade(index,TestIDs,TaskIDs,UserIDs) {
+        gradearry[index] = $("#" + index).val()
+        TaskID[index] =TaskIDs
+        TestID[index] =TestIDs
+        UserID[index] =UserIDs
+    },
+    inputcomment(index) {
+        commentarry[index] = $("#comment" + index).val()
+        alert(commentarry[a])
+    }
+    }
+    });
 </script>
+
 {{/block}}

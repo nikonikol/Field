@@ -15,7 +15,7 @@ var infoquery = require('./models/mysql')
 //加载md5插件
 var md5 = require('blueimp-md5')
 //加载运算函数
-var calbulk= require('./public/js/cal.js')
+var calbulk = require('./public/js/cal.js')
 //promise函数
 function mypinfoquery(sql) {
     return new Promise(function (resolve, reject) {
@@ -293,11 +293,11 @@ router.get('/task', function (req, res) {
                 }
                 if (task) {
                     for (var i = 0; i < task.length; i++) {
-                    //把时间转换
-                    task[i].FromTime=task[i].FromTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
-                    task[i].EndTime=task[i].EndTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                        //把时间转换
+                        task[i].FromTime = task[i].FromTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                        task[i].EndTime = task[i].EndTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
                     }
-                    
+
                     res.render('task.html', {
                         Userinformation: req.session.Userinformation,
                         task: task
@@ -439,6 +439,7 @@ router.get('/deletetask', function (req, res) {
         testtable.TestName,
         testtable.TaskId,
         testtable.Content,
+        testtable.State,
         testtable.TotalGrade,
         testtable.Deadtime
         FROM
@@ -450,9 +451,14 @@ router.get('/deletetask', function (req, res) {
                     if (err) {
                         return res.status(500).send('Server error')
                     }
+                    for (var i = 0; i < test.length; i++) {
+                        //把时间转换
+                        test[i].Deadtime = test[i].Deadtime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                    }
                     if (test) {
                         res.render('test.html', {
                             Userinformation: req.session.Userinformation,
+                            taskid:taskid,
                             test: test
                         })
                     }
@@ -493,6 +499,7 @@ router.get('/newtest', function (req, res) {
                 }
                 if (newtest) {
                     res.render('newtest.html', {
+                        taskid:taskid,
                         Userinformation: req.session.Userinformation,
                         newtest: newtest
                     })
@@ -679,14 +686,17 @@ router.get('/correctexam', function (req, res) {
     a.Name,
     c.Answer,
     c.SubmitTime,
+    c.UserId,
     b.TotalGrade,
+    b.Testid,
+    b.TaskId,
     b.Content
     FROM
     testresult AS c
     LEFT JOIN studentinfo AS a ON a.UserId = c.UserId
     LEFT JOIN testtable AS b ON b.Testid = c.TestId AND b.TaskId = c.TaskId
     WHERE
-    c.TaskId = ` + TaskId + ` AND c.TestId = ` + TestId + `
+    c.TaskId = ` + TaskId + ` AND c.TestId = ` + TestId + ` AND c.State=0
 `;
     (async () => {
 
@@ -748,35 +758,47 @@ router.get('/correctexam', function (req, res) {
 })
 router.post('/correctexam', function (req, res) {
     var sql = null
-    var grade = req.body.grade
-    var correctcontent = req.body.correctcontent
-    try {
-        sql = `"UPDATE
-        testresult
-        SET 
-        
-        `
-        infoquery(sql, function (err, data) {
-            if (err) {
-
-                return res.status(200).json({
-                    err_code: 1,
-                    message: ''
-                })
-            } else {
-                res.status(200).json({
-                    err_code: 0,
-                    message: 'OK'
-                })
+    var gradearry = req.body.gradelist.split(',')
+    var commentarry = req.body.commentlist.split(',')
+    var TestID = req.body.TestID.split(',')
+    var TaskID = req.body.TaskID.split(',')
+    var UserID = req.body.UserID.split(',')
+    console.log(TestID, 'ExamList')
+    console.log(TaskID, 'ExamList')
+    console.log(gradearry, 'gradearry')
+    console.log(commentarry, 'commentarry')
+    console.log(UserID, 'UserID')
+   
+        ;
+        (async () => {
+        try {
+        for(i=0;i<gradearry.length;i++){
+            await mypinfoquery("UPDATE testresult SET Grade=" + gradearry[i] + ",State=1,Evaluate='" + commentarry[i] + "' WHERE UserId='" + UserID[i] + "' AND TaskId=" + TaskID[i] + " AND TestId=" + TestID[i])
+            await mypinfoquery("UPDATE testtable SET State=1 WHERE TaskId=" + TaskID[i] + " AND TestId=" + TestID[i])
+            const queryresult = await mypinfoquery(`SELECT testresult.Grade FROM testresult WHERE testresult.TaskId=` + TaskID[i]  + ` AND testresult.UserId ='` + UserID[i] + `'`)
+            SumGrade = 0
+            for (j = 0; j < queryresult.length; j++) {
+                SumGrade += queryresult[j].Grade
             }
-        })
-
+            await mypinfoquery("UPDATE testresult SET FinallyGrade=" + SumGrade + "  WHERE UserId='" + UserID[i] + "' AND TaskId=" + TaskID[i])
+        }
     } catch (err) {
         res.status(500).json({
             err_code: 500,
             message: err.message
         })
     }
+
+    return res.status(200).json({
+        err_code: 0,
+        message: ''
+    })
+    })()
+   
+      
+  
+
+   
 })
 
 
@@ -794,18 +816,22 @@ router.get('/studenttask', function (req, res) {
         try {
             sql = `SELECT
         studentinfo.UserId,
+        studentinfo.Class,
         studentinfo.Name,
         location.LastTime,
         location.Location,
-        tasktable.TaskId
+        tasktable.TaskId,
+        testresult.FinallyGrade
         FROM
         studentinfo,
         location,
-        tasktable
+        tasktable,
+        testresult
         WHERE
         tasktable.TaskId="` + taskid + `"AND
         tasktable.Class=studentinfo.Class AND
-        studentinfo.UserId=location.UserId
+        studentinfo.UserId=location.UserId AND
+        studentinfo.UserId = testresult.UserId
         ORDER BY
         studentinfo.UserId
         `
@@ -884,6 +910,56 @@ router.get('/allstudent', function (req, res) {
  * 地图操作
  */
 
+//统计
+router.get('/stastic', function (req, res) {
+    console.log('tag', '')
+    if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
+        return res.redirect('/')
+    } else {
+        var sql = null
+        var userid = req.session.Userinformation[0].UserId
+        try {
+            sql = `SELECT
+        tasktable.TaskId,
+        tasktable.FromTime,
+        tasktable.EndTime,
+        tasktable.TaskName,
+        tasktable.Class,
+        tasktable.Address,
+        tasktable.TaskContent,
+        tasktable.Sponsor,
+        tasktable.TaskState
+    FROM
+        tasktable
+    WHERE
+        tasktable.Sponsor="` + userid + `"
+    `
+            infoquery(sql, function (err, map) {
+                if (err) {
+                    return res.status(500).send('Server error')
+                }
+                if (map) {
+                    for (var i = 0; i < map.length; i++) {
+                        //把时间转换
+                        map[i].FromTime = map[i].FromTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                        map[i].EndTime = map[i].EndTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                    }
+                    res.render('stastic.html', {
+                        Userinformation: req.session.Userinformation,
+                        map: map
+                    })
+                }
+            })
+        } catch (err) {
+            res.status(500).json({
+                code: 2,
+                err: err.message,
+                message: ''
+            })
+        }
+
+    }
+})
 //显示地图，先进入选择任务界面
 router.get('/map', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
@@ -912,6 +988,11 @@ router.get('/map', function (req, res) {
                     return res.status(500).send('Server error')
                 }
                 if (map) {
+                    for (var i = 0; i < map.length; i++) {
+                        //把时间转换
+                        map[i].FromTime = map[i].FromTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                        map[i].EndTime = map[i].EndTime.toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+                    }
                     res.render('map.html', {
                         Userinformation: req.session.Userinformation,
                         map: map
@@ -1072,21 +1153,21 @@ router.post('/SaveExcle', function (req, res) {
     console.log(insertData)
 
     try {
-       //插入数据库
-    for (i = 0; i < insertData.length; i++) {
-        UserId = insertData[i].UserId
-        Name = insertData[i].Name
-        Password = insertData[i].UserId
-        Nickname = insertData[i].Name
-        Class = insertData[i].Class
-        AddData(UserId, Name, Password, Nickname, Class)
-    }
+        //插入数据库
+        for (i = 0; i < insertData.length; i++) {
+            UserId = insertData[i].UserId
+            Name = insertData[i].Name
+            Password = insertData[i].UserId
+            Nickname = insertData[i].Name
+            Class = insertData[i].Class
+            AddData(UserId, Name, Password, Nickname, Class)
+        }
 
-    res.render('saveexcle.html',{
-        Userinformation: req.session.Userinformation,
-        Success: '文件上传成功'
-    })
-        
+        res.render('saveexcle.html', {
+            Userinformation: req.session.Userinformation,
+            Success: '文件上传成功'
+        })
+
     } catch (err) {
         console.log(err.message)
         res.status(500).json({
@@ -1095,13 +1176,13 @@ router.post('/SaveExcle', function (req, res) {
             message: []
         })
 
-        res.render('saveexcle.html',{
+        res.render('saveexcle.html', {
             Userinformation: req.session.Userinformation,
             Success: '文件上传失败'
         })
     }
 
-    
+
     function AddData(UserId, Name, Password, Nickname, Class) {
         console.log(UserId, Name, Password, Nickname, Class)
         searchsql = `SELECT
@@ -1114,17 +1195,17 @@ router.post('/SaveExcle', function (req, res) {
         var updatesql = "UPDATE studentinfo SET UserId='" + UserId + "',Name='" + Name + "',Password='" + Password + "',  Nickname='" + Nickname + "',  Class='" + Class + "' WHERE UserId='" + UserId + "'"
         var insectsql = "INSERT INTO studentinfo (UserId,Name,Password,Nickname,Icon,Class,Role) VALUES('" + UserId + "','" + Name + "','" + Password + "','" + Nickname + "','http://k.zol-img.com.cn/sjbbs/7692/a7691515_s.jpg','" + Class + "',0)"
 
-        ;(async () => {
-      
-                const result = await mypinfoquery(searchsql)
-                if (result[0] === undefined) {
-                    // 插入
-                    await mypinfoquery(insectsql)
-                }
-                else{
-                    // 更新
-                    await mypinfoquery(updatesql)
-                }
+        ;
+        (async () => {
+
+            const result = await mypinfoquery(searchsql)
+            if (result[0] === undefined) {
+                // 插入
+                await mypinfoquery(insectsql)
+            } else {
+                // 更新
+                await mypinfoquery(updatesql)
+            }
 
         })()
 
@@ -1200,19 +1281,19 @@ router.post('/gradedisplay', function (req, res) {
             }
             querysult = studentgradelist
             queryname = studentgradename
-            if(querysult[0] != undefined){
-                var name=new Array
-                var mycaldata = new Array    
+            if (querysult[0] != undefined) {
+                var name = new Array
+                var mycaldata = new Array
                 for (var i = 0; i < querysult.length; i++) {
                     mycaldata[i] = querysult[i]
                 }
-             for (var i = 0; i < queryname.length; i++) {
-                        name[i] = queryname[i]
-                    }
+                for (var i = 0; i < queryname.length; i++) {
+                    name[i] = queryname[i]
+                }
                 return res.status(200).json({
-                    calreason:calbulk.cal(mycaldata),
-                    name:name,
-                    grade:mycaldata
+                    calreason: calbulk.cal(mycaldata),
+                    name: name,
+                    grade: mycaldata
                 })
             }
             //studentgrade[i]=querysult[i].FinallyGrade

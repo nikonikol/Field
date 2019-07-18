@@ -12,7 +12,7 @@
         <small>信息</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="/test?Taskid={{newtest[0].TaskId}}"><i class="fa fa-dashboard"></i> 测试</a></li>
+        <li><a href="/test?Taskid={{taskid}}"><i class="fa fa-dashboard"></i> 测试</a></li>
         <li class="active">新建测试</li>
     </ol>
 </section>
@@ -94,7 +94,7 @@
                 if (data.err_code === 0) {
                     window.alert('添加成功')
                     // 服务端重定向针对异步请求无效
-                    window.location.href = '/test?Taskid={{newtest[0].TaskId}}'
+                    window.location.href = '/test?Taskid={{taskid}}'
                 } else if (data.err_code === 1) {
                     window.alert('添加失败！')
                 } else if (data.err_code === 500) {
@@ -106,3 +106,12 @@
 </script>
 
 {{/block}}
+
+
+
+
+
+
+
+
+
