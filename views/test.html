@@ -67,14 +67,14 @@
                                     {{each test}}
                                     <tr>
                                             <!-- <td class="mailbox-star">{{$value.Testid}}</td> -->
-                                            <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a></td>
+                                            <td class="mailbox-star"><a href="#"><i class="fa fa-star text-yellow"></i></a>{{$value.State==1?'已经批改':'未批改'}}</td>
                                             <td class="mailbox-name"><a href="#">{{$value.TestName}}</a></td>
                                             <td class="mailbox-subject"><b>{{$value.Content}}</b> 
                                             </td>
                                             <td class="mailbox-attachment">{{$value.Deadtime}}</td>
                                             <td class="mailbox-date">{{$value.TotalGrade}}</td>
                                             <td class="mailbox-date">
-                                            <a href="/deletetest?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">修改</a>
+                                            <a href="/correctexam?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">批改测试</a>
                                             <td class="mailbox-date">
                                             <a href="/deletetest?Taskid={{$value.TaskId}}&Testid={{$value.Testid}}">删除</a>
                                 </tr>

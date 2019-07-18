@@ -589,6 +589,7 @@ router.get('/deletetest', function (req, res) {
     }
 })
 
+
 //批改测试
 router.get('/correcttest', function (req, res) {
     if (req.session.Userinformation === null || req.session.Userinformation === undefined) {
@@ -612,7 +613,7 @@ router.get('/correcttest', function (req, res) {
     WHERE
         tasktable.Sponsor="` + userid + `"
     `
-            mysql(sql, function (err, task) {
+            infoquery(sql, function (err, task) {
                 if (err) {
                     return res.status(500).send('Server error')
                 }
@@ -671,7 +672,81 @@ router.get('/correcttest', function (req, res) {
     }
 })
 
-router.post('/correcttest', function (req, res) {
+router.get('/correctexam', function (req, res) {
+    var TaskId = req.query.Taskid
+    var TestId = req.query.Testid
+    searchsql = `SELECT
+    a.Name,
+    c.Answer,
+    c.SubmitTime,
+    b.TotalGrade,
+    b.Content
+    FROM
+    testresult AS c
+    LEFT JOIN studentinfo AS a ON a.UserId = c.UserId
+    LEFT JOIN testtable AS b ON b.Testid = c.TestId AND b.TaskId = c.TaskId
+    WHERE
+    c.TaskId = ` + TaskId + ` AND c.TestId = ` + TestId + `
+`;
+    (async () => {
+
+        const result = await mypinfoquery(searchsql)
+
+        console.log(result, '')
+
+        res.render('examcorrect.html', {
+            Userinformation: req.session.Userinformation,
+            ExamList: result
+        })
+        // if (result[0] === undefined) {
+        //     // 插入
+        //     await mypinfoquery(insectsql)
+        // }
+        // else{
+        //     // 更新
+        //     await mypinfoquery(updatesql)
+        // }
+
+    })()
+
+
+
+
+
+
+
+    // var sql = null
+    // var grade = req.body.grade
+    // var correctcontent = req.body.correctcontent
+    // try {
+    //     sql = `"UPDATE
+    //     testresult
+    //     SET 
+
+    //     `
+    //     infoquery(sql, function (err, data) {
+    //         if (err) {
+
+    //             return res.status(200).json({
+    //                 err_code: 1,
+    //                 message: ''
+    //             })
+    //         } else {
+    //             res.status(200).json({
+    //                 err_code: 0,
+    //                 message: 'OK'
+    //             })
+    //         }
+    //     })
+
+    // } catch (err) {
+    //     res.status(500).json({
+    //         err_code: 500,
+    //         message: err.message
+    //     })
+    // }
+})
+router.post('/correctexam', function (req, res) {
     var sql = null
     var grade = req.body.grade
     var correctcontent = req.body.correctcontent
