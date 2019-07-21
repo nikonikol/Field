@@ -1,5 +1,3 @@
-
-
 function cal(data1){
     var data = data1;
     var reason ={

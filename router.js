@@ -1024,6 +1024,7 @@ router.get('/taskmap', function (req, res) {
 
     router.post('/taskmap', function (req, res) {
         var taskid = parseInt(req.headers.referer.split('=').slice(1, 2)[0])
+        var count="count"
         try {
             sql = `SELECT
         studentinfo.Name,
@@ -1040,7 +1041,7 @@ router.get('/taskmap', function (req, res) {
         `
             infoquery(sql, function (err, taskmap) {
                 //获取最后一个值 
-                // console.log(JSON.parse(taskmap[0].Location).location.slice(-1)[0].log)
+                
                 if (err) {
                     return res.status(500).send('Server error')
                 }
