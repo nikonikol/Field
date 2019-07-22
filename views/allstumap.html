@@ -32,7 +32,14 @@
         </div>
         <div class="input-item">
             <button class="btn" onclick="heatmap.hide()">关闭热力图</button>
-    
+        </div>
+        <div class="input-item">
+            <input type="button"  class="btn" value="夜晚模式" id="setcolor" onclick="setcolor()"/>
+        </div>
+
+     
+        
+    </div>
 
 </section>
 
@@ -44,11 +51,7 @@
 {{block 'js'}}
 
 <!-- 加载地图JSAPI脚本 -->
-<<<<<<< HEAD
-<script src="//webapi.amap.com/maps?v=1.4.15&key=ab969b0985106a6a6e83338a5595d02a"></script>
-=======
-<script src="https://webapi.amap.com/maps?v=1.4.14&key=	6720ba9cdc62c5edd13dd2fbb1c837c1"></script>
->>>>>>> c74adddfec37c1bff66ed66a42271eff81d688b1
+<script src="//webapi.amap.com/maps?v=1.4.15&key=6720ba9cdc62c5edd13dd2fbb1c837c1"></script>
 <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
 <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
 <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
@@ -78,20 +81,16 @@
         resizeEnable: true, //是否监控地图容器尺寸变化
         zoom: 13, //初始化地图层级
         center: [JSON.parse(taskmap[0].Location).location.slice(-1)[0].log, JSON.parse(taskmap[0].Location)
-<<<<<<< HEAD
-            .location.slice(-1)[0].lat] //初始化地图中心点
-=======
             .location.slice(-1)[0].lat
         ] //初始化地图中心点
       
->>>>>>> c74adddfec37c1bff66ed66a42271eff81d688b1
     });
 
     //逆编码
     AMap.plugin('AMap.Geocoder', function () {
         var geocoder = new AMap.Geocoder({
             // city 指定进行编码查询的城市，支持传入城市名、adcode 和 citycode
-            city: china
+            city: 'china'
         })
         for (var i = 0, marker; i < length; i++) {
             var lnglat=JSON.parse(taskmap[i].Location).location.slice(-1)[0]
@@ -123,7 +122,9 @@
         <div><b>学号:` + taskmap[i].UserId + `</b></div>
        
         <a class='btn btn-success btn-block' href='/onemap?UserId=` + taskmap[i].UserId + `'>行走轨迹</a>
-        <a class='btn btn-success btn-block' >判断周围100米人数</a>
+        设置搜索半径<input type="number" id="radiu" >
+       <button class="btn" onclick="search()">搜索</button>
+        
         </div>`;
         marker.on('click', markerClick,);
         marker.emit('click', {
@@ -153,7 +154,7 @@
     map.plugin(["AMap.Heatmap"], function () {
         //初始化heatmap对象
         heatmap = new AMap.Heatmap(map, {
-            // radius: , //给定半径
+             radius:100 , //给定半径
             opacity: [0, 1]
             /*,
             gradient:{
@@ -182,12 +183,55 @@
         return !!(elem.getContext && elem.getContext('2d'));
     }
 
+    var position=null
     //点击事件
     function markerClick(e) {
         infoWindow.setContent(e.target.content);
         infoWindow.open(map, e.target.getPosition());
+        position=e.target.getPosition()
     }
-    
+    //点击事件
+    function search() {
+        if(position==null){
+            alert('请选择一个点')
+        }
+        var radiu=$('#radiu').val()
+        var radiuarry =[]
+        var circle = new AMap.Circle({
+        center: position,
+        radius: radiu, //半径
+        borderWeight: 3,
+        strokeColor: "#FF33FF", 
+        strokeOpacity: 1,
+        strokeWeight: 6,
+        strokeOpacity: 0.2,
+        fillOpacity: 0.4,
+        strokeStyle: 'dashed',
+        strokeDasharray: [10, 10], 
+        // 线样式还支持 'dashed'
+        fillColor: '#1791fc',
+        zIndex: 50,
+    })
+
+   
+    circle.setMap(map)
+   
+
+    }
+    var color=true
+    function setcolor () {
+        if(color){
+            $('#setcolor').val('白天模式')
+            map.setMapStyle('amap://styles/f4800375c8b7e0d23edb0fad7eb88c86');
+        }
+        else
+        {
+            map.setMapStyle('amap://styles/71a2bf5e8241388de6a5489f41633b36');
+            $('#setcolor').val('夜晚模式')
+        }
+        
+        color=!color
+    }
     //设置圆
 
 </script>

@@ -24,12 +24,7 @@
     <!-- 个人运动轨迹 -->
     <div></div>
     <div class="map" id="map">
-        <div class="input-card" style="width: 120px">
-            <button class="btn" onclick="circleEditor.open()" style="margin-bottom: 5px">开始编辑</button> 
-            <button class="btn" onclick="circleEditor.close()">结束编辑</button> 
-            <input type="button"  class="btn" value="夜晚模式" id="setcolor" onclick="setcolor()"/>
-            <input type="button" class="btn" value="开始动画" id="start" onclick="startAnimation()"/>
-        </div>
+     
     </div>
 
     
@@ -124,19 +119,6 @@
     function startAnimation () {
         marker.moveAlong(lineArr, 200);
     }
-    var color=true
-    function setcolor () {
-        if(color){
-            $('#setcolor').val('白天模式')
-            map.setMapStyle('amap://styles/f4800375c8b7e0d23edb0fad7eb88c86');
-        }
-        else
-        {
-            map.setMapStyle('amap://styles/71a2bf5e8241388de6a5489f41633b36');
-            $('#setcolor').val('夜晚模式')
-        }
-        
-        color=!color
-    }
+  
 </script>
 {{/block}}
