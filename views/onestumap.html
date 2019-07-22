@@ -21,10 +21,12 @@
 {{block 'content'}}
 <section class="content">
     <!-- 个人运动轨迹 -->
+    <div><input type="button" style="float: right" class="btn" value="夜晚模式" id="start" onclick="setcolor()"/></div>
     <div class="map" id="map">
     
     </div>
     <div><input type="button" class="btn" value="开始动画" id="start" onclick="startAnimation()"/></div>
+    
     
 </section>
 
@@ -36,7 +38,7 @@
 {{block 'js'}}
 
 <!-- 加载地图JSAPI脚本 -->
-<script src="https://webapi.amap.com/maps?v=1.4.14&key=	ab969b0985106a6a6e83338a5595d02a"></script>
+<script src="https://webapi.amap.com/maps?v=1.4.14&key=	6720ba9cdc62c5edd13dd2fbb1c837c1"></script>
 <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
 <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
 <script>
@@ -115,6 +117,9 @@
 
     function startAnimation () {
         marker.moveAlong(lineArr, 200);
+    }
+    function setcolor () {
+        map.setMapStyle('amap://styles/f4800375c8b7e0d23edb0fad7eb88c86');
     }
 </script>
 {{/block}}
